@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конфиденциальность - PageViewer</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-gray-800">
+    <nav class="bg-white shadow-sm py-4">
+        <div class="container mx-auto px-4 md:px-6 flex justify-between items-center">
+            <a href="index.html" class="flex items-center space-x-2">
+                <img src="assets/pageviewer.ico" alt="Логотип PageViewer" class="h-8 w-8">
+                <span class="text-xl font-bold text-gray-800">PageViewer</span>
+            </a>
+            <a href="index.html" class="text-gray-600 hover:text-primary-500 transition">На главную</a>
+        </div>
+    </nav>
+
+    <main class="py-20">
+        <div class="container mx-auto px-4 md:px-6 max-w-3xl">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">Конфиденциальность</h1>
+            <p class="text-lg text-gray-600 mb-8">PageViewer сделан как локальное desktop-приложение, поэтому данные проектов остаются на устройстве пользователя.</p>
+
+            <section class="space-y-6 text-gray-600">
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-3">Какие данные обрабатываются</h2>
+                    <p>Приложение может хранить стартовые URL, списки страниц, результаты краулинга, HTTP-коды, мета-данные, селекторы и экспортируемые таблицы.</p>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-3">Где хранятся данные</h2>
+                    <p>Рабочие проекты и результаты сохраняются локально в хранилище приложения на компьютере пользователя. Данные не требуют облачной передачи для базовой работы продукта.</p>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-3">Экспорт</h2>
+                    <p>Пользователь может выгружать результаты в XLS и самостоятельно решает, где хранить и кому передавать экспортированные файлы.</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4 md:px-6 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-gray-400 mb-4 md:mb-0">© 2026 PageViewer. Все права защищены.</p>
+            <div class="flex space-x-6">
+                <a href="terms.html" class="text-gray-400 hover:text-white transition">Пользовательское соглашение</a>
+                <a href="privacy.html" class="text-gray-400 hover:text-white transition">Конфиденциальность</a>
+                <a href="cookies.html" class="text-gray-400 hover:text-white transition">Cookies</a>
+                <a href="disclaimer.html" class="text-gray-400 hover:text-white transition">Отказ от ответственности</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
