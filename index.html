@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PageViewer - Инструмент SEO автоматизации</title>
-    <link rel="icon" type="image/x-icon" href="assets/pageviewer.ico">
+    <link rel="icon" type="image/x-icon" href="assets/page-viewer-logo.png">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
@@ -16,6 +16,10 @@
                     colors: {
                         primary: {
                             500: '#0ea5e9',
+                        },
+                        accent: {
+                            100: '#d6f6f8',
+                            500: '#0cb6bf',
                         },
                         secondary: {
                             500: '#6366f1',
@@ -60,6 +64,27 @@
         .hero-screenshot {
             border-radius: 14px;
         }
+        .i-tabler-scan,
+        .i-tabler-brackets {
+            display: inline-block;
+            width: 1.5rem;
+            height: 1.5rem;
+            background-color: currentColor;
+            -webkit-mask-repeat: no-repeat;
+            mask-repeat: no-repeat;
+            -webkit-mask-position: center;
+            mask-position: center;
+            -webkit-mask-size: contain;
+            mask-size: contain;
+        }
+        .i-tabler-scan {
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7V6a2 2 0 0 1 2-2h2'/%3E%3Cpath d='M4 17v1a2 2 0 0 0 2 2h2'/%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v1'/%3E%3Cpath d='M16 20h2a2 2 0 0 0 2-2v-1'/%3E%3Cpath d='M5 12h14'/%3E%3C/svg%3E");
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7V6a2 2 0 0 1 2-2h2'/%3E%3Cpath d='M4 17v1a2 2 0 0 0 2 2h2'/%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v1'/%3E%3Cpath d='M16 20h2a2 2 0 0 0 2-2v-1'/%3E%3Cpath d='M5 12h14'/%3E%3C/svg%3E");
+        }
+        .i-tabler-brackets {
+            -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 4h-3v16h3'/%3E%3Cpath d='M16 4h3v16h-3'/%3E%3C/svg%3E");
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 4h-3v16h3'/%3E%3Cpath d='M16 4h3v16h-3'/%3E%3C/svg%3E");
+        }
         .feature-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -77,7 +102,7 @@
     <nav class="bg-white shadow-sm py-4">
         <div class="container mx-auto px-4 md:px-6 flex justify-between items-center">
             <div class="flex items-center space-x-2">
-                <img src="assets/pageviewer.ico" alt="Логотип PageViewer" class="h-8 w-8">
+                <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-8 w-8">
                 <span class="text-xl font-bold text-gray-800">PageViewer</span>
             </div>
             <div class="hidden md:flex space-x-8">
@@ -119,14 +144,14 @@
     <section id="features" class="py-20 bg-white">
         <div class="container mx-auto px-4 md:px-6">
             <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">Мощные возможности</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">Все, что нужно для улучшения SEO-процессов</p>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4">Возможности PageViewer</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Все, что нужно для краулинга, аудита и парсинга сайтов</p>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div class="feature-card bg-white p-8 rounded-xl border border-gray-100 shadow-sm transition duration-300">
                     <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-6">
-                        <i data-feather="play-circle" class="text-primary-500 w-6 h-6"></i>
+                        <span class="i-tabler-scan text-primary-500" aria-hidden="true"></span>
                     </div>
                     <h3 class="text-xl font-semibold text-gray-800 mb-3">Краулинг сайта</h3>
                     <ul class="space-y-2 text-gray-600">
@@ -148,7 +173,7 @@
                 </div>
                 <div class="feature-card bg-white p-8 rounded-xl border border-gray-100 shadow-sm transition duration-300">
                     <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-6">
-                        <i data-feather="list" class="text-primary-500 w-6 h-6"></i>
+                        <span class="i-tabler-brackets text-primary-500" aria-hidden="true"></span>
                     </div>
                     <h3 class="text-xl font-semibold text-gray-800 mb-3">Парсинг URL</h3>
                     <ul class="space-y-2 text-gray-600">
@@ -178,6 +203,17 @@
                         <li>Настройка таймаута и параллельности рендера.</li>
                     </ul>
                 </div>
+                <div class="feature-card bg-white p-8 rounded-xl border border-gray-100 shadow-sm transition duration-300">
+                    <div class="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-6">
+                        <i data-feather="folder" class="text-primary-500 w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Проекты</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li>Создание отдельных проектов для разных сайтов.</li>
+                        <li>Быстрое переключение между проектами в интерфейсе.</li>
+                        <li>Отдельные настройки, результаты краулинга, селекторы и таблицы для каждого проекта.</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </section>
@@ -196,25 +232,25 @@
                         <h3 class="text-2xl font-semibold text-gray-800 mb-4">Бесплатная версия</h3>
                         <ul class="space-y-3 mb-8">
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-green-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Базовое сканирование сайтов</span>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
+                                <span>Краулинг сайта</span>
                             </li>
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-green-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Обработка ключевых слов (до 1,000)</span>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
+                                <span>Парсинг данных со страниц</span>
                             </li>
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-green-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Базовая семантическая кластеризация</span>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
+                                <span>Рендеринг через Chromium</span>
                             </li>
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-green-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Экспорт в CSV/Excel</span>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
+                                <span>Экспорт в Excel</span>
                             </li>
                         </ul>
                         
                         <div class="space-y-4">
-                            <a href="#" class="download-btn block bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md text-center">
+                            <a href="#" class="download-btn block border border-primary-500 text-primary-500 hover:bg-primary-50 font-semibold py-3 px-6 rounded-lg text-center">
                                 <div class="flex items-center justify-center">
                                     <i data-feather="download" class="w-5 h-5 mr-2"></i>
                                     Скачать для Windows
@@ -230,35 +266,34 @@
                     </div>
                     
                     <div class="md:w-1/2 bg-primary-50 p-8 md:p-12">
-                        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Pro версия</h3>
+                        <div class="mb-4 flex items-center gap-3">
+                            <h3 class="text-2xl font-semibold text-gray-800">Pro версия</h3>
+                            <span class="rounded-full bg-accent-100 px-3 py-1 text-sm font-semibold text-accent-500">Скоро</span>
+                        </div>
                         <p class="text-gray-600 mb-6">Обновитесь, чтобы получить все возможности без ограничений.</p>
                         <div class="flex items-end mb-6">
-                            <span class="text-4xl font-bold text-gray-800">$29</span>
+                            <span class="text-4xl font-bold text-gray-800">299</span>
                             <span class="text-gray-600 ml-2">/месяц</span>
                         </div>
                         <ul class="space-y-3 mb-8">
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-secondary-500 w-5 h-5 mr-2 mt-0.5"></i>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
                                 <span>Продвинутое сканирование сайтов</span>
                             </li>
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-secondary-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Неограниченная обработка ключевых слов</span>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
+                                <span>SEO-аудит</span>
                             </li>
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-secondary-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Продвинутая AI-кластеризация</span>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
+                                <span>Интеграция в панелью Вебмастера</span>
                             </li>
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-secondary-500 w-5 h-5 mr-2 mt-0.5"></i>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
                                 <span>Приоритетная поддержка</span>
                             </li>
-                            <li class="flex items-start">
-                                <i data-feather="check" class="text-secondary-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Доступ к API</span>
-                            </li>
                         </ul>
-                        <a href="#" class="download-btn block bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md text-center">
+                        <a aria-disabled="true" class="block cursor-not-allowed rounded-lg bg-gray-300 py-3 px-6 text-center font-semibold text-gray-500 shadow-sm opacity-70">
                             Обновить до Pro
                         </a>
                     </div>
@@ -277,58 +312,103 @@
             
             <div class="max-w-3xl mx-auto">
                 <div class="space-y-6">
-                    <!-- FAQ 1 -->
                     <div class="border border-gray-200 rounded-xl overflow-hidden">
                         <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
-                            <span class="text-lg font-medium text-gray-800">PageViewer действительно бесплатен?</span>
+                            <span class="text-lg font-medium text-gray-800">Что такое PageViewer?</span>
                             <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
                         </button>
                         <div class="faq-content px-6 pb-6 hidden">
-                            <p class="text-gray-600">Да! Бесплатная версия PageViewer включает базовое сканирование сайтов, обработку ключевых слов (до 1,000) и семантическую кластеризацию. Вы можете в любое время обновиться до Pro-версии, чтобы получить все возможности.</p>
+                            <p class="text-gray-600">PageViewer — это desktop-приложение для краулинга, технической проверки и парсинга сайтов. Оно помогает просканировать страницы, проверить URL, найти ошибки и собрать нужные данные в таблицу.</p>
                         </div>
                     </div>
-                    
-                    <!-- FAQ 2 -->
                     <div class="border border-gray-200 rounded-xl overflow-hidden">
                         <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
-                            <span class="text-lg font-medium text-gray-800">Какие ОС поддерживает PageViewer?</span>
+                            <span class="text-lg font-medium text-gray-800">PageViewer работает в браузере или как отдельная программа?</span>
                             <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
                         </button>
                         <div class="faq-content px-6 pb-6 hidden">
-                            <p class="text-gray-600">PageViewer доступен для Windows (10 и новее) и macOS (10.15 Catalina и новее). Мы работаем над версией для Linux, которая появится в ближайшее время.</p>
+                            <p class="text-gray-600">PageViewer устанавливается как отдельное приложение на компьютер. Оно работает локально и не требует открывать сервис в браузере.</p>
                         </div>
                     </div>
-                    
-                    <!-- FAQ 3 -->
                     <div class="border border-gray-200 rounded-xl overflow-hidden">
                         <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
-                            <span class="text-lg font-medium text-gray-800">Как работает AI-классификация?</span>
+                            <span class="text-lg font-medium text-gray-800">Для чего можно использовать PageViewer?</span>
                             <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
                         </button>
                         <div class="faq-content px-6 pb-6 hidden">
-                            <p class="text-gray-600">Наш собственный алгоритм ИИ анализирует ключевые слова и контент на основе семантических связей, поисковых намерений и тематической релевантности. Затем он автоматически группирует связанные элементы и предлагает структуры контента, соответствующие ожиданиям поисковых систем.</p>
+                            <p class="text-gray-600">Для технического SEO-аудита, проверки URL, поиска ошибок, анализа редиректов, сбора title, H1, description, ссылок и других данных со страниц сайта.</p>
                         </div>
                     </div>
-                    
-                    <!-- FAQ 4 -->
                     <div class="border border-gray-200 rounded-xl overflow-hidden">
                         <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
-                            <span class="text-lg font-medium text-gray-800">Можно ли использовать PageViewer для нескольких сайтов?</span>
+                            <span class="text-lg font-medium text-gray-800">Где хранятся данные проекта?</span>
                             <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
                         </button>
                         <div class="faq-content px-6 pb-6 hidden">
-                            <p class="text-gray-600">Конечно! В бесплатной версии вы можете анализировать до 3 сайтов одновременно. Pro-версия позволяет анализировать неограниченное количество сайтов и включает инструменты для сравнения их эффективности.</p>
+                            <p class="text-gray-600">Данные проектов и результаты проверок хранятся локально на компьютере пользователя. Это удобно, если вы не хотите передавать данные сайта в облачные сервисы.</p>
                         </div>
                     </div>
-                    
-                    <!-- FAQ 5 -->
                     <div class="border border-gray-200 rounded-xl overflow-hidden">
                         <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
-                            <span class="text-lg font-medium text-gray-800">Какая поддержка доступна?</span>
+                            <span class="text-lg font-medium text-gray-800">Можно ли сканировать весь сайт?</span>
                             <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
                         </button>
                         <div class="faq-content px-6 pb-6 hidden">
-                            <p class="text-gray-600">Все пользователи получают доступ к нашей документации и форуму. Пользователи бесплатной версии могут писать нам на email, а Pro-пользователи получают приоритетную email-поддержку (обычно в течение 24 часов) и доступ к онлайн-чату в рабочее время.</p>
+                            <p class="text-gray-600">Да. Вы можете указать стартовый URL и запустить краулинг. В настройках можно ограничить глубину обхода, скорость запросов, таймауты и другие параметры.</p>
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                            <span class="text-lg font-medium text-gray-800">Можно ли проверить только список нужных страниц?</span>
+                            <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
+                        </button>
+                        <div class="faq-content px-6 pb-6 hidden">
+                            <p class="text-gray-600">Да. Для этого можно загрузить список URL и запустить парсинг только по выбранным страницам.</p>
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                            <span class="text-lg font-medium text-gray-800">Какие данные можно собирать со страниц?</span>
+                            <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
+                        </button>
+                        <div class="faq-content px-6 pb-6 hidden">
+                            <p class="text-gray-600">По умолчанию можно собирать title, H1, description и количество ссылок. Также можно добавить собственные CSS-селекторы и извлекать нужные элементы, атрибуты, числа, текст или количество найденных элементов.</p>
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                            <span class="text-lg font-medium text-gray-800">Поддерживает ли PageViewer JavaScript-страницы?</span>
+                            <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
+                        </button>
+                        <div class="faq-content px-6 pb-6 hidden">
+                            <p class="text-gray-600">Да. В приложении есть режим рендеринга через Chromium для страниц, где важный контент появляется после выполнения JavaScript.</p>
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                            <span class="text-lg font-medium text-gray-800">Можно ли экспортировать результаты?</span>
+                            <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
+                        </button>
+                        <div class="faq-content px-6 pb-6 hidden">
+                            <p class="text-gray-600">Да. Результаты можно отфильтровать, настроить видимые колонки и экспортировать в XLS.</p>
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                            <span class="text-lg font-medium text-gray-800">Нужны ли навыки программирования?</span>
+                            <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
+                        </button>
+                        <div class="faq-content px-6 pb-6 hidden">
+                            <p class="text-gray-600">Для базового краулинга и проверки сайта — нет. Для расширенного парсинга полезно понимать CSS-селекторы, но в приложении есть подсказки и примеры.</p>
+                        </div>
+                    </div>
+                    <div class="border border-gray-200 rounded-xl overflow-hidden">
+                        <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                            <span class="text-lg font-medium text-gray-800">Можно ли использовать PageViewer для SEO-аудита?</span>
+                            <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
+                        </button>
+                        <div class="faq-content px-6 pb-6 hidden">
+                            <p class="text-gray-600">Да. PageViewer помогает находить технические проблемы: ошибки ответа, редиректы, запрещенные URL, глубину вложенности, пустые или некорректные мета-данные и другие данные, которые важны для SEO.</p>
                         </div>
                     </div>
                 </div>
@@ -341,8 +421,8 @@
     <footer class="bg-gray-900 text-white py-12">
         <div class="container mx-auto px-4 md:px-6">
             <div class="flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400 mb-4 md:mb-0">© 2026 PageViewer. Все права защищены.</p>
-                <div class="flex space-x-6">
+                <p class="text-gray-400 mb-4 md:mb-0">© 2026 PageViewer.</p>
+                <div class="footer-links">
                     <a href="terms.html" class="text-gray-400 hover:text-white transition">Пользовательское соглашение</a>
                     <a href="privacy.html" class="text-gray-400 hover:text-white transition">Конфиденциальность</a>
                     <a href="cookies.html" class="text-gray-400 hover:text-white transition">Cookies</a>

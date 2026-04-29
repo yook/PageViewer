@@ -13,18 +13,6 @@ main {
 	flex: 1;
 }
 
-h1 {
-	font-size: 16px;
-	margin-top: 0;
-}
-
-p {
-	color: rgb(107, 114, 128);
-	font-size: 15px;
-	margin-bottom: 10px;
-	margin-top: 5px;
-}
-
 .card {
 	max-width: 620px;
 	margin: 0 auto;
@@ -33,6 +21,158 @@ p {
 	border-radius: 16px;
 }
 
+.card h1 {
+	font-size: 16px;
+	margin-top: 0;
+}
+
+.card p {
+	color: rgb(107, 114, 128);
+	font-size: 15px;
+	margin-bottom: 10px;
+	margin-top: 5px;
+}
+
 .card p:last-child {
 	margin-bottom: 0;
+}
+
+.content-page {
+	padding: 80px 0;
+}
+
+.content-container {
+	width: 100%;
+	max-width: 768px;
+	margin: 0 auto;
+	padding: 0 16px;
+}
+
+.content-title {
+	margin: 0 0 24px;
+	color: rgb(31, 41, 55);
+	font-size: 40px;
+	font-weight: 700;
+	line-height: 1.1;
+}
+
+.content-lead {
+	margin: 0 0 32px;
+	color: rgb(75, 85, 99);
+	font-size: 18px;
+	line-height: 1.7;
+}
+
+.content-lead + .content-lead {
+	margin-top: -16px;
+}
+
+.content-body {
+	display: grid;
+	gap: 24px;
+	color: rgb(75, 85, 99);
+	font-size: 16px;
+	line-height: 1.7;
+}
+
+.content-section {
+	display: grid;
+	gap: 12px;
+}
+
+.content-heading {
+	margin: 0;
+	color: rgb(31, 41, 55);
+	font-size: 24px;
+	font-weight: 600;
+	line-height: 1.25;
+}
+
+.content-body p {
+	margin: 0;
+	color: inherit;
+	font-size: inherit;
+	line-height: inherit;
+}
+
+.content-body ul,
+.content-list {
+	display: grid;
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.content-body li {
+	position: relative;
+	margin: 0;
+	padding-left: 18px;
+	color: inherit;
+	font-size: inherit;
+	line-height: inherit;
+}
+
+.content-body ul li::before {
+	content: "-";
+	position: absolute;
+	left: 0;
+	color: inherit;
+}
+
+.content-body a {
+	color: rgb(14, 165, 233);
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.content-body a:hover {
+	color: rgb(2, 132, 199);
+	text-decoration: underline;
+}
+
+.content-body strong {
+	color: rgb(31, 41, 55);
+	font-weight: 600;
+}
+
+.site-link {
+	color: rgb(75, 85, 99);
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.site-link:hover {
+	color: rgb(14, 165, 233);
+}
+
+.footer-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px 24px;
+	justify-content: center;
+}
+
+.footer-links a {
+	color: rgb(156, 163, 175);
+	text-decoration: none;
+	transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+	color: rgb(255, 255, 255);
+}
+
+@media (max-width: 640px) {
+	.content-page {
+		padding: 56px 0;
+	}
+
+	.content-title {
+		font-size: 32px;
+	}
+
+	.content-lead {
+		font-size: 17px;
+	}
 }
