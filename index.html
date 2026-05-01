@@ -179,7 +179,7 @@
                     <ul class="space-y-2 text-gray-600">
                         <li>Загрузка списка URL вручную.</li>
                         <li>Запуск отдельного процесса парсинга.</li>
-                        <li>Таблица результатов по настроенным селекторам.</li>
+                        <li>Парсинг HTML страницы по CSS-селекторам или XPath, в зависимости от выбранного типа селектора.</li>
                     </ul>
                 </div>
                 <div class="feature-card bg-white p-8 rounded-xl border border-gray-100 shadow-sm transition duration-300">
@@ -190,7 +190,7 @@
                     <ul class="space-y-2 text-gray-600">
                         <li>Настройка видимых колонок.</li>
                         <li>Сортировка, фильтрация и удаление отфильтрованных записей.</li>
-                        <li>Выгрузка результатов в XLS.</li>
+                        <li>Выгрузка результатов в CSV, Excel и JSON.</li>
                     </ul>
                 </div>
                 <div class="feature-card bg-white p-8 rounded-xl border border-gray-100 shadow-sm transition duration-300">
@@ -245,7 +245,7 @@
                             </li>
                             <li class="flex items-start">
                                 <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Экспорт в Excel</span>
+                                <span>Экспорт в CSV, Excel и JSON</span>
                             </li>
                         </ul>
                         
@@ -363,7 +363,7 @@
                             <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
                         </button>
                         <div class="faq-content px-6 pb-6 hidden">
-                            <p class="text-gray-600">Да. Для этого можно загрузить список URL и запустить парсинг только по выбранным страницам.</p>
+                            <p class="text-gray-600">Да. Для этого можно загрузить список URL и запустить парсинг только по выбранным страницам, используя CSS-селекторы или XPath в зависимости от выбранного типа селектора.</p>
                         </div>
                     </div>
                     <div class="border border-gray-200 rounded-xl overflow-hidden">
@@ -372,7 +372,7 @@
                             <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
                         </button>
                         <div class="faq-content px-6 pb-6 hidden">
-                            <p class="text-gray-600">По умолчанию можно собирать title, H1, description и количество ссылок. Также можно добавить собственные CSS-селекторы и извлекать нужные элементы, атрибуты, числа, текст или количество найденных элементов.</p>
+                            <p class="text-gray-600">По умолчанию можно собирать title, H1, description и количество ссылок. Также можно добавить собственные селекторы: PageViewer парсит HTML страницы по CSS-селекторам или XPath, в зависимости от выбранного типа селектора, и помогает извлекать нужные элементы, атрибуты, числа, текст или количество найденных элементов.</p>
                         </div>
                     </div>
                     <div class="border border-gray-200 rounded-xl overflow-hidden">
@@ -390,7 +390,7 @@
                             <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
                         </button>
                         <div class="faq-content px-6 pb-6 hidden">
-                            <p class="text-gray-600">Да. Результаты можно отфильтровать, настроить видимые колонки и экспортировать в XLS.</p>
+                            <p class="text-gray-600">Да. Результаты можно отфильтровать, настроить видимые колонки и экспортировать в CSV, Excel и JSON.</p>
                         </div>
                     </div>
                     <div class="border border-gray-200 rounded-xl overflow-hidden">
@@ -399,7 +399,7 @@
                             <i data-feather="chevron-down" class="w-5 h-5 text-gray-600 transform transition-transform"></i>
                         </button>
                         <div class="faq-content px-6 pb-6 hidden">
-                            <p class="text-gray-600">Для базового краулинга и проверки сайта — нет. Для расширенного парсинга полезно понимать CSS-селекторы, но в приложении есть подсказки и примеры.</p>
+                            <p class="text-gray-600">Для базового краулинга и проверки сайта — нет. Для расширенного парсинга полезно понимать CSS-селекторы или XPath, но в приложении есть подсказки и примеры.</p>
                         </div>
                     </div>
                     <div class="border border-gray-200 rounded-xl overflow-hidden">
