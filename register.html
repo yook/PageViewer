@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - PageViewer</title>
+    <link rel="icon" type="image/x-icon" href="assets/page-viewer-logo.png">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            500: '#0ea5e9',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="auth-page text-gray-800">
+    <main class="auth-main">
+        <div class="auth-shell">
+            <section class="auth-card">
+                <a href="index.html" class="mb-8 flex items-center justify-center space-x-3 text-center">
+                    <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-9 w-9">
+                    <span class="text-2xl font-bold text-gray-800">PageViewer</span>
+                </a>
+                <div class="auth-panel">
+                    <h2 class="auth-card-title text-center">Введите email для регистрации</h2>
+
+                    <form class="auth-form">
+                        <label class="auth-field">
+                            <span class="auth-label">Email</span>
+                            <input class="auth-input" type="email" name="register-email" placeholder="you@example.com" data-field="email">
+                            <span class="auth-error" data-error-for="email"></span>
+                        </label>
+
+                        <label class="auth-field">
+                            <span class="auth-label">Пароль</span>
+                            <input class="auth-input" type="password" name="register-password" placeholder="Придумайте пароль" data-field="password">
+                            <span class="auth-hint">Минимум 8 символов, хотя бы одна буква и одна цифра.</span>
+                            <span class="auth-error" data-error-for="password"></span>
+                        </label>
+
+                        <label class="auth-field">
+                            <span class="auth-label">Повтор пароля</span>
+                            <input class="auth-input" type="password" name="register-password-repeat" placeholder="Повторите пароль" data-field="password-repeat">
+                            <span class="auth-error" data-error-for="password-repeat"></span>
+                        </label>
+
+                        <button class="auth-button" type="submit">Создать аккаунт</button>
+
+                        <p class="auth-legal">
+                            Нажимая кнопку, вы принимаете <a href="terms.html" class="auth-link" target="_blank" rel="noopener noreferrer">Пользовательское соглашение</a> и <a href="offer.html" class="auth-link" target="_blank" rel="noopener noreferrer">Публичную оферту</a>.
+                            Обработка персональных данных осуществляется в соответствии с <a href="privacy.html" class="auth-link" target="_blank" rel="noopener noreferrer">Политикой конфиденциальности</a>.
+                        </p>
+
+                        <div class="auth-divider">или</div>
+
+                        <p class="auth-footnote">Уже есть аккаунт? <a href="login.html" class="auth-link">Войти</a></p>
+                    </form>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <script>
+        feather.replace();
+
+        const registerForm = document.querySelector('.auth-form');
+        const registerEmailInput = registerForm?.querySelector('[data-field="email"]');
+        const registerPasswordInput = registerForm?.querySelector('[data-field="password"]');
+        const registerRepeatInput = registerForm?.querySelector('[data-field="password-repeat"]');
+
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const passwordPattern = /^(?=.*[A-Za-zА-Яа-яЁё])(?=.*\d).{8,}$/;
+
+        const setError = (input, message) => {
+            const error = registerForm?.querySelector(`[data-error-for="${input.dataset.field}"]`);
+            input.classList.toggle('is-invalid', Boolean(message));
+            if (error) {
+                error.textContent = message || '';
+                error.classList.toggle('is-visible', Boolean(message));
+            }
+        };
+
+        const validateEmail = () => {
+            const value = registerEmailInput.value.trim();
+            if (!value) {
+                setError(registerEmailInput, 'Введите email');
+                return false;
+            }
+            if (!emailPattern.test(value)) {
+                setError(registerEmailInput, 'Введите корректный email');
+                return false;
+            }
+            setError(registerEmailInput, '');
+            return true;
+        };
+
+        const validatePassword = () => {
+            const value = registerPasswordInput.value;
+            if (!value) {
+                setError(registerPasswordInput, 'Введите пароль');
+                return false;
+            }
+            if (!passwordPattern.test(value)) {
+                setError(registerPasswordInput, 'Пароль должен содержать минимум 8 символов, букву и цифру');
+                return false;
+            }
+            setError(registerPasswordInput, '');
+            return true;
+        };
+
+        const validatePasswordRepeat = () => {
+            const value = registerRepeatInput.value;
+            if (!value) {
+                setError(registerRepeatInput, 'Повторите пароль');
+                return false;
+            }
+            if (value !== registerPasswordInput.value) {
+                setError(registerRepeatInput, 'Пароли не совпадают');
+                return false;
+            }
+            setError(registerRepeatInput, '');
+            return true;
+        };
+
+        registerEmailInput?.addEventListener('blur', validateEmail);
+        registerEmailInput?.addEventListener('input', () => {
+            if (registerEmailInput.classList.contains('is-invalid')) validateEmail();
+        });
+
+        registerPasswordInput?.addEventListener('blur', validatePassword);
+        registerPasswordInput?.addEventListener('input', () => {
+            if (registerPasswordInput.classList.contains('is-invalid')) validatePassword();
+            if (registerRepeatInput.value) validatePasswordRepeat();
+        });
+
+        registerRepeatInput?.addEventListener('blur', validatePasswordRepeat);
+        registerRepeatInput?.addEventListener('input', () => {
+            if (registerRepeatInput.classList.contains('is-invalid')) validatePasswordRepeat();
+        });
+
+        registerForm?.addEventListener('submit', (event) => {
+            const isEmailValid = validateEmail();
+            const isPasswordValid = validatePassword();
+            const isRepeatValid = validatePasswordRepeat();
+            if (!isEmailValid || !isPasswordValid || !isRepeatValid) {
+                event.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>

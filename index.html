@@ -89,6 +89,13 @@
             transform: translateY(-5px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
+        .pricing-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
         .download-btn {
             transition: all 0.3s ease;
         }
@@ -105,14 +112,29 @@
                 <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-8 w-8">
                 <span class="text-xl font-bold text-gray-800">PageViewer</span>
             </div>
-            <div class="hidden md:flex space-x-8">
-                <a href="#features" class="text-gray-600 hover:text-primary-500 transition">Возможности</a>
-                <a href="#download" class="text-gray-600 hover:text-primary-500 transition">Скачать</a>
-                <a href="#faq" class="text-gray-600 hover:text-primary-500 transition">FAQ</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <div class="flex items-center space-x-8">
+                    <a href="#features" class="text-gray-600 hover:text-primary-500 transition">Возможности</a>
+                    <a href="#download" class="text-gray-600 hover:text-primary-500 transition">Скачать</a>
+                    <a href="#faq" class="text-gray-600 hover:text-primary-500 transition">FAQ</a>
+                </div>
+                <a href="login.html" class="inline-flex items-center rounded-lg border border-primary-500 px-4 py-2 text-sm font-semibold text-primary-500 transition hover:bg-primary-50">
+                    Вход
+                </a>
             </div>
-            <button class="md:hidden">
+            <button id="mobile-menu-toggle" class="md:hidden" type="button" aria-expanded="false" aria-controls="mobile-menu">
                 <i data-feather="menu" class="w-6 h-6"></i>
             </button>
+        </div>
+        <div id="mobile-menu" class="hidden border-t border-gray-100 px-4 pt-4 pb-2 md:hidden">
+            <div class="container mx-auto flex flex-col gap-3 px-0">
+                <a href="#features" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">Возможности</a>
+                <a href="#download" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">Скачать</a>
+                <a href="#faq" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">FAQ</a>
+                <a href="login.html" class="mt-2 inline-flex items-center justify-center rounded-lg border border-primary-500 px-4 py-3 text-sm font-semibold text-primary-500 transition hover:bg-primary-50">
+                    Вход
+                </a>
+            </div>
         </div>
     </nav>
 
@@ -227,29 +249,37 @@
                 <p class="text-gray-600 max-w-2xl mx-auto">Начните использовать бесплатную версию уже сегодня</p>
             </div>
             
-            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="md:flex">
-                    <div class="md:w-1/2 p-8 md:p-12">
-                        <h3 class="text-2xl font-semibold text-gray-800 mb-4">Бесплатная версия</h3>
-                        <ul class="space-y-3 mb-8">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid gap-8 lg:grid-cols-2">
+                    <div class="pricing-card rounded-xl border border-gray-200 bg-white p-8 shadow-sm md:p-10">
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-4 text-center">Free</h3>
+                        <p class="text-center text-gray-600 mb-8">Подходит для знакомства с продуктом и работы с небольшими проектами.</p>
+                        <div class="flex items-end justify-center mb-8">
+                            <span class="text-5xl font-bold text-gray-800">0</span>
+                            <span class="text-gray-600 ml-2 text-xl">руб</span>
+                        </div>
+                        <ul class="space-y-4 mb-8 text-gray-700">
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Краулинг сайта</span>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
+                                <span>До 3 проектов</span>
                             </li>
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Парсинг данных со страниц</span>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
+                                <span>До 1 000 URL на проект</span>
                             </li>
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Рендеринг через Chromium</span>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
+                                <span>Экспорт XLS до 1 000 строк</span>
                             </li>
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Экспорт в CSV, Excel и JSON</span>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
+                                <span>Параллельность 1 поток</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
+                                <span>Интервал между запросами от 1000 мс</span>
                             </li>
                         </ul>
-                        
                         <div class="space-y-4">
                             <a href="#" class="download-btn block border border-primary-500 text-primary-500 hover:bg-primary-50 font-semibold py-3 px-6 rounded-lg text-center">
                                 <div class="flex items-center justify-center">
@@ -265,40 +295,139 @@
                             </a>
                         </div>
                     </div>
-                    
-                    <div class="md:w-1/2 bg-primary-50 p-8 md:p-12">
-                        <div class="mb-4 flex items-center gap-3">
-                            <h3 class="text-2xl font-semibold text-gray-800">Pro версия</h3>
-                            <span class="rounded-full bg-accent-100 px-3 py-1 text-sm font-semibold text-accent-500">Скоро</span>
+
+                    <div class="pricing-card rounded-xl border border-gray-200 bg-white p-8 shadow-sm md:p-10">
+                        <div class="mb-4 flex items-center justify-center">
+                            <h3 class="text-2xl font-semibold text-gray-800">Pro</h3>
                         </div>
-                        <p class="text-gray-600 mb-6">Обновитесь, чтобы получить все возможности без ограничений.</p>
-                        <div class="flex items-end mb-6">
-                            <span class="text-4xl font-bold text-gray-800">299 руб</span>
-                            <span class="text-gray-600 ml-2">/месяц</span>
+                        <p class="text-center text-gray-600 mb-8">Для регулярной работы с крупными сайтами и расширенными возможностями приложения.</p>
+                        <div class="flex items-end justify-center mb-8">
+                            <span class="text-5xl font-bold text-gray-800">1800</span>
+                            <span class="text-gray-600 ml-2 text-xl">руб / год</span>
                         </div>
-                        <ul class="space-y-3 mb-8">
+                        <ul class="space-y-4 mb-8 text-gray-700">
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Продвинутое сканирование сайтов</span>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
+                                <span>Нет ограничений по количеству проектов</span>
                             </li>
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>SEO-аудит</span>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
+                                <span>Нет ограничений по URL на проект</span>
                             </li>
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Интеграция в панелью Вебмастера</span>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
+                                <span>Полный экспорт XLS</span>
                             </li>
                             <li class="flex items-start">
-                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-2 mt-0.5"></i>
-                                <span>Приоритетная поддержка</span>
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
+                                <span>Параллельность без ограничений</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
+                                <span>Любой интервал между запросами</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
+                                <span>Рендеринг страниц через Chromium</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
+                                <span>Лицензия на 1 аккаунт сроком на 12 месяцев</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
+                                <span>Активация после оплаты и возможная привязка к устройству</span>
                             </li>
                         </ul>
-                        <a aria-disabled="true" class="block cursor-not-allowed rounded-lg bg-gray-300 py-3 px-6 text-center font-semibold text-gray-500 shadow-sm opacity-70">
-                            Обновить до Pro
+                        <a href="#" class="download-btn block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600">
+                            Перейти на Pro
                         </a>
+                        <p class="pricing-note mt-4 text-center text-sm text-gray-500">Отказаться можно в любой момент. Вернем деньги за неиспользованный период.</p>
                     </div>
                 </div>
+
+                <div class="mt-8 text-center">
+                    <button id="plans-comparison-toggle" class="inline-flex items-center gap-2 text-lg font-semibold text-primary-500 hover:text-primary-600">
+                        <span>Показать сравнение тарифов</span>
+                        <i data-feather="chevron-down" class="h-5 w-5 transition-transform"></i>
+                    </button>
+                </div>
+
+                <div id="plans-comparison" class="mt-8 hidden overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-500 md:px-10">Функция</th>
+                                <th class="px-6 py-4 text-left text-sm font-semibold text-gray-800 md:px-8">Free</th>
+                                <th class="bg-primary-50 px-6 py-4 text-left text-sm font-semibold text-gray-800 md:px-8">Pro</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-800 md:px-10">Количество проектов</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 md:px-8">До 3 проектов</td>
+                                <td class="bg-primary-50 px-6 py-4 text-sm text-gray-700 md:px-8">Нет ограничений</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-800 md:px-10">URL на проект</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 md:px-8">До 1 000 URL</td>
+                                <td class="bg-primary-50 px-6 py-4 text-sm text-gray-700 md:px-8">Нет ограничений</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-800 md:px-10">Экспорт XLS</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 md:px-8">До 1 000 строк</td>
+                                <td class="bg-primary-50 px-6 py-4 text-sm text-gray-700 md:px-8">Полный экспорт</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-800 md:px-10">Параллельность краулинга</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 md:px-8">Параллельность 1 поток</td>
+                                <td class="bg-primary-50 px-6 py-4 text-sm text-gray-700 md:px-8">Параллельность без ограничений</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-800 md:px-10">Интервал между запросами</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 md:px-8">От 1000 мс</td>
+                                <td class="bg-primary-50 px-6 py-4 text-sm text-gray-700 md:px-8">Любой интервал между запросами</td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-800 md:px-10">Парсинг по CSS и XPath</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 md:px-8">
+                                    <i data-feather="check" class="h-5 w-5 text-primary-500"></i>
+                                </td>
+                                <td class="bg-primary-50 px-6 py-4 text-sm text-gray-700 md:px-8">
+                                    <i data-feather="check" class="h-5 w-5 text-primary-500"></i>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-800 md:px-10">Экспорт CSV, Excel и JSON</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 md:px-8">
+                                    <i data-feather="check" class="h-5 w-5 text-primary-500"></i>
+                                </td>
+                                <td class="bg-primary-50 px-6 py-4 text-sm text-gray-700 md:px-8">
+                                    <i data-feather="check" class="h-5 w-5 text-primary-500"></i>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-800 md:px-10">Хранение данных локально</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 md:px-8">
+                                    <i data-feather="check" class="h-5 w-5 text-primary-500"></i>
+                                </td>
+                                <td class="bg-primary-50 px-6 py-4 text-sm text-gray-700 md:px-8">
+                                    <i data-feather="check" class="h-5 w-5 text-primary-500"></i>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-800 md:px-10">Рендеринг страниц</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 md:px-8">
+                                    <i data-feather="x" class="h-5 w-5 text-red-500"></i>
+                                </td>
+                                <td class="bg-primary-50 px-6 py-4 text-sm text-gray-700 md:px-8">
+                                    <i data-feather="check" class="h-5 w-5 text-primary-500"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </div>
     </section>
@@ -422,8 +551,9 @@
     <footer class="bg-gray-900 text-white py-12">
         <div class="container mx-auto px-4 md:px-6">
             <div class="flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-400 mb-4 md:mb-0">© 2026 PageViewer.</p>
+                <p class="footer-copy text-gray-400 mb-4 md:mb-0">© 2026 PageViewer</p>
                 <div class="footer-links">
+                    <a href="offer.html" class="text-gray-400 hover:text-white transition">Публичная оферта</a>
                     <a href="terms.html" class="text-gray-400 hover:text-white transition">Пользовательское соглашение</a>
                     <a href="privacy.html" class="text-gray-400 hover:text-white transition">Конфиденциальность</a>
                     <a href="cookies.html" class="text-gray-400 hover:text-white transition">Cookies</a>
@@ -470,6 +600,39 @@
                 icon.classList.toggle('rotate-180');
             });
         });
+
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener('click', () => {
+                const isHidden = mobileMenu.classList.toggle('hidden');
+                mobileMenuToggle.setAttribute('aria-expanded', String(!isHidden));
+            });
+
+            mobileMenu.querySelectorAll('a').forEach((link) => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    mobileMenuToggle.setAttribute('aria-expanded', 'false');
+                });
+            });
+        }
+
+        const plansComparisonToggle = document.getElementById('plans-comparison-toggle');
+        const plansComparison = document.getElementById('plans-comparison');
+        if (plansComparisonToggle && plansComparison) {
+            const toggleLabel = plansComparisonToggle.querySelector('span');
+            const toggleIcon = plansComparisonToggle.querySelector('i');
+
+            plansComparisonToggle.addEventListener('click', () => {
+                const isHidden = plansComparison.classList.toggle('hidden');
+                if (toggleLabel) {
+                    toggleLabel.textContent = isHidden ? 'Показать сравнение тарифов' : 'Скрыть сравнение тарифов';
+                }
+                if (toggleIcon) {
+                    toggleIcon.classList.toggle('rotate-180', !isHidden);
+                }
+            });
+        }
         
         // Simple animation for feature cards on scroll
         const observer = new IntersectionObserver((entries) => {

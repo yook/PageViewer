@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход - PageViewer</title>
+    <link rel="icon" type="image/x-icon" href="assets/page-viewer-logo.png">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            500: '#0ea5e9',
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="auth-page text-gray-800">
+    <main class="auth-main">
+        <div class="auth-shell">
+            <section class="auth-card">
+                <a href="index.html" class="mb-8 flex items-center justify-center space-x-3 text-center">
+                    <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-9 w-9">
+                    <span class="text-2xl font-bold text-gray-800">PageViewer</span>
+                </a>
+                <div class="auth-panel">
+                    <h2 class="auth-card-title text-center">Введите email для входа</h2>
+
+                    <form class="auth-form">
+                        <label class="auth-field">
+                            <span class="auth-label">Email</span>
+                            <input class="auth-input" type="email" name="login-email" placeholder="you@example.com" data-field="email">
+                            <span class="auth-error" data-error-for="email"></span>
+                        </label>
+
+                        <label class="auth-field">
+                            <span class="auth-label">Пароль</span>
+                            <input class="auth-input" type="password" name="login-password" placeholder="Введите пароль" data-field="password">
+                            <span class="auth-error" data-error-for="password"></span>
+                        </label>
+
+                        <div class="auth-form-row">
+                            <a href="forgot-password.html" class="auth-link">Забыли пароль?</a>
+                        </div>
+
+                        <button class="auth-button" type="submit">Войти</button>
+
+                        <div class="auth-divider">или</div>
+
+                        <p class="auth-footnote">Нет аккаунта? <a href="register.html" class="auth-link">Зарегистрироваться</a></p>
+                    </form>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <script>
+        feather.replace();
+
+        const loginForm = document.querySelector('.auth-form');
+        const emailInput = loginForm?.querySelector('[data-field="email"]');
+        const passwordInput = loginForm?.querySelector('[data-field="password"]');
+
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        const setError = (input, message) => {
+            const error = loginForm?.querySelector(`[data-error-for="${input.dataset.field}"]`);
+            input.classList.toggle('is-invalid', Boolean(message));
+            if (error) {
+                error.textContent = message || '';
+                error.classList.toggle('is-visible', Boolean(message));
+            }
+        };
+
+        const validateEmail = () => {
+            const value = emailInput.value.trim();
+            if (!value) {
+                setError(emailInput, 'Введите email');
+                return false;
+            }
+            if (!emailPattern.test(value)) {
+                setError(emailInput, 'Введите корректный email');
+                return false;
+            }
+            setError(emailInput, '');
+            return true;
+        };
+
+        const validatePassword = () => {
+            const value = passwordInput.value;
+            if (!value) {
+                setError(passwordInput, 'Введите пароль');
+                return false;
+            }
+            setError(passwordInput, '');
+            return true;
+        };
+
+        emailInput?.addEventListener('blur', validateEmail);
+        emailInput?.addEventListener('input', () => {
+            if (emailInput.classList.contains('is-invalid')) validateEmail();
+        });
+
+        passwordInput?.addEventListener('blur', validatePassword);
+        passwordInput?.addEventListener('input', () => {
+            if (passwordInput.classList.contains('is-invalid')) validatePassword();
+        });
+
+        loginForm?.addEventListener('submit', (event) => {
+            const isEmailValid = validateEmail();
+            const isPasswordValid = validatePassword();
+            if (!isEmailValid || !isPasswordValid) {
+                event.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
