@@ -9,11 +9,15 @@
         }
 
         const hostname = window.location.hostname;
-        if (hostname === 'pageviewer.ru' || hostname === 'www.pageviewer.ru') {
-            return 'https://api.pageviewer.ru';
+        if (
+            hostname === 'localhost' ||
+            hostname === '127.0.0.1' ||
+            hostname === '::1'
+        ) {
+            return 'http://localhost:3001';
         }
 
-        return 'http://localhost:3001';
+        return 'https://api.pageviewer.ru';
     };
 
     const API_BASE_URL = inferApiBaseUrl().replace(/\/$/, '');

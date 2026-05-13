@@ -118,9 +118,13 @@
                     <a href="#download" class="text-gray-600 hover:text-primary-500 transition">Скачать</a>
                     <a href="#faq" class="text-gray-600 hover:text-primary-500 transition">FAQ</a>
                 </div>
-                <a href="login.html" class="inline-flex items-center rounded-lg border border-primary-500 px-4 py-2 text-sm font-semibold text-primary-500 transition hover:bg-primary-50">
+                <a href="login.html" class="inline-flex items-center rounded-lg border border-primary-500 px-4 py-2 text-sm font-semibold text-primary-500 transition hover:bg-primary-50" data-auth-guest>
                     Вход
                 </a>
+                <div class="hidden items-center gap-3" data-auth-user>
+                    <a href="account.html" class="max-w-[220px] truncate text-sm font-semibold text-gray-700 hover:text-primary-500" data-auth-email>Аккаунт</a>
+                    <button class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:border-primary-500 hover:text-primary-500" type="button" data-auth-logout>Выйти</button>
+                </div>
             </div>
             <button id="mobile-menu-toggle" class="md:hidden" type="button" aria-expanded="false" aria-controls="mobile-menu">
                 <i data-feather="menu" class="w-6 h-6"></i>
@@ -131,9 +135,13 @@
                 <a href="#features" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">Возможности</a>
                 <a href="#download" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">Скачать</a>
                 <a href="#faq" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">FAQ</a>
-                <a href="login.html" class="mt-2 inline-flex items-center justify-center rounded-lg border border-primary-500 px-4 py-3 text-sm font-semibold text-primary-500 transition hover:bg-primary-50">
+                <a href="login.html" class="mt-2 inline-flex items-center justify-center rounded-lg border border-primary-500 px-4 py-3 text-sm font-semibold text-primary-500 transition hover:bg-primary-50" data-auth-guest>
                     Вход
                 </a>
+                <div class="hidden flex-col gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3" data-auth-user>
+                    <a href="account.html" class="truncate text-sm font-semibold text-gray-700" data-auth-email>Аккаунт</a>
+                    <button class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-600" type="button" data-auth-logout>Выйти</button>
+                </div>
             </div>
         </div>
     </nav>
@@ -281,13 +289,14 @@
                             </li>
                         </ul>
                         <div class="space-y-4">
-                            <a href="#" class="download-btn block border border-primary-500 text-primary-500 hover:bg-primary-50 font-semibold py-3 px-6 rounded-lg text-center">
+                            <div class="download-alert" data-download-alert hidden></div>
+                            <a href="#" class="download-btn block border border-primary-500 text-primary-500 hover:bg-primary-50 font-semibold py-3 px-6 rounded-lg text-center" data-download-platform="windows">
                                 <div class="flex items-center justify-center">
                                     <i data-feather="download" class="w-5 h-5 mr-2"></i>
                                     Скачать для Windows
                                 </div>
                             </a>
-                            <a href="#" class="download-btn block border border-primary-500 text-primary-500 hover:bg-primary-50 font-semibold py-3 px-6 rounded-lg text-center">
+                            <a href="#" class="download-btn block border border-primary-500 text-primary-500 hover:bg-primary-50 font-semibold py-3 px-6 rounded-lg text-center" data-download-platform="macos">
                                 <div class="flex items-center justify-center">
                                     <i data-feather="download" class="w-5 h-5 mr-2"></i>
                                     Скачать для macOS
@@ -330,19 +339,11 @@
                                 <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
                                 <span>Рендеринг страниц через Chromium</span>
                             </li>
-                            <li class="flex items-start">
-                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
-                                <span>Лицензия на 1 аккаунт сроком на 12 месяцев</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i data-feather="check" class="text-primary-500 w-5 h-5 mr-3 mt-0.5"></i>
-                                <span>Активация после оплаты и возможная привязка к устройству</span>
-                            </li>
                         </ul>
-                        <a href="#" class="download-btn block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600">
+                        <a href="account.html" class="download-btn block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600" data-pro-link>
                             Перейти на Pro
                         </a>
-                        <p class="pricing-note mt-4 text-center text-sm text-gray-500">Отказаться можно в любой момент. Вернем деньги за неиспользованный период.</p>
+                        <p class="pricing-note mt-4 text-center text-xs text-gray-500">Отказаться можно в любой момент. Вернем деньги за неиспользованный период.</p>
                     </div>
                 </div>
 
@@ -575,6 +576,7 @@
         </div>
     </div>
 
+    <script src="auth.js"></script>
     <script>
         feather.replace();
 
@@ -589,6 +591,99 @@
                 cookieBanner.classList.add('hidden');
             });
         }
+
+        const setAuthNavigation = () => {
+            const isAuthenticated = window.PageViewerAuth.isAuthenticated();
+            const user = window.PageViewerAuth.getUser();
+            const email = user?.email || 'Аккаунт';
+
+            document.querySelectorAll('[data-auth-guest]').forEach((item) => {
+                item.classList.toggle('hidden', isAuthenticated);
+            });
+
+            document.querySelectorAll('[data-auth-user]').forEach((item) => {
+                item.classList.toggle('hidden', !isAuthenticated);
+                item.classList.toggle('flex', isAuthenticated);
+            });
+
+            document.querySelectorAll('[data-auth-email]').forEach((item) => {
+                item.textContent = email;
+                item.setAttribute('title', email);
+            });
+        };
+
+        document.querySelectorAll('[data-auth-logout]').forEach((button) => {
+            button.addEventListener('click', async () => {
+                button.disabled = true;
+                button.textContent = 'Выходим...';
+                await window.PageViewerAuth.logout();
+                setAuthNavigation();
+                button.disabled = false;
+                button.textContent = 'Выйти';
+            });
+        });
+
+        setAuthNavigation();
+
+        const downloadAlert = document.querySelector('[data-download-alert]');
+        const setDownloadAlert = (message, type = 'error') => {
+            if (!downloadAlert) return;
+            downloadAlert.hidden = !message;
+            downloadAlert.textContent = message || '';
+            downloadAlert.className = `download-alert download-alert-${type}`;
+        };
+
+        const withDownloadLoading = async (link, callback) => {
+            const originalHtml = link.innerHTML;
+            link.classList.add('is-loading');
+            link.setAttribute('aria-busy', 'true');
+            link.innerHTML = '<span>Готовим ссылку...</span>';
+            try {
+                await callback();
+            } finally {
+                link.classList.remove('is-loading');
+                link.removeAttribute('aria-busy');
+                link.innerHTML = originalHtml;
+                feather.replace();
+            }
+        };
+
+        document.querySelectorAll('[data-download-platform]').forEach((link) => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const platform = link.dataset.downloadPlatform || window.PageViewerAuth.detectPlatform();
+                setDownloadAlert('');
+
+                if (!window.PageViewerAuth.isAuthenticated()) {
+                    window.PageViewerAuth.savePostLoginRedirect('/#download');
+                    window.location.href = 'register.html';
+                    return;
+                }
+
+                withDownloadLoading(link, async () => {
+                    try {
+                        await window.PageViewerAuth.startDownload(platform);
+                    } catch (error) {
+                        const normalized = window.PageViewerAuth.normalizeError(error);
+                        if (normalized.code === 'invalid_refresh_token' || normalized.status === 401) {
+                            window.PageViewerAuth.clearTokens();
+                            window.PageViewerAuth.savePostLoginRedirect('/#download');
+                            window.location.href = 'register.html';
+                            return;
+                        }
+                        setDownloadAlert(normalized.message, 'error');
+                    }
+                });
+            });
+        });
+
+        document.querySelector('[data-pro-link]')?.addEventListener('click', (event) => {
+            if (!window.PageViewerAuth.isAuthenticated()) {
+                event.preventDefault();
+                window.PageViewerAuth.savePostLoginRedirect('/#download');
+                window.location.href = 'login.html';
+            }
+        });
         
         // FAQ toggle functionality
         document.querySelectorAll('.faq-toggle').forEach(button => {
