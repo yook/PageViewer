@@ -175,14 +175,31 @@
 
     const getUser = () => decodeJwtPayload(tokenStore.accessToken);
 
+    const resolveAppUrl = (url) => {
+        const target = url || '/';
+        if (window.location.protocol !== 'file:' || !target.startsWith('/')) {
+            return target;
+        }
+
+        if (target === '/') {
+            return 'index.html';
+        }
+
+        if (target.startsWith('/#')) {
+            return `index.html${target.slice(1)}`;
+        }
+
+        return target.slice(1);
+    };
+
     const savePostLoginRedirect = (url) => {
-        sessionStorage.setItem(POST_LOGIN_REDIRECT_KEY, url || '/');
+        sessionStorage.setItem(POST_LOGIN_REDIRECT_KEY, resolveAppUrl(url));
     };
 
     const consumePostLoginRedirect = () => {
         const value = sessionStorage.getItem(POST_LOGIN_REDIRECT_KEY);
         sessionStorage.removeItem(POST_LOGIN_REDIRECT_KEY);
-        return value;
+        return resolveAppUrl(value);
     };
 
     const detectPlatform = () => {
@@ -229,6 +246,7 @@
         },
         messages,
         normalizeError,
+        resolveAppUrl,
         apiRequest,
         setTokens: tokenStore.setTokens.bind(tokenStore),
         clearTokens: tokenStore.clear.bind(tokenStore),

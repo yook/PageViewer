@@ -530,6 +530,23 @@ body.auth-page {
 	line-height: 1.5;
 }
 
+.site-plan-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 52px;
+	height: 24px;
+	border: 1px solid rgb(14, 165, 233);
+	border-radius: 9999px;
+	background: rgba(14, 165, 233, 0.08);
+	padding: 0 10px;
+	color: rgb(14, 165, 233);
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.2px;
+	line-height: 1;
+}
+
 .download-alert {
 	border: 1px solid transparent;
 	border-radius: 14px;

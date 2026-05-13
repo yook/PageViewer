@@ -177,7 +177,7 @@
             window.PageViewerAuth.login(emailInput.value.trim(), passwordInput.value)
                 .then((data) => {
                     window.PageViewerAuth.setTokens(data);
-                    window.location.href = window.PageViewerAuth.consumePostLoginRedirect() || '/';
+                    window.location.href = window.PageViewerAuth.consumePostLoginRedirect() || window.PageViewerAuth.resolveAppUrl('/');
                 })
                 .catch((error) => {
                     const normalized = window.PageViewerAuth.normalizeError(error);

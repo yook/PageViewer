@@ -5,37 +5,164 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Аккаунт - PageViewer</title>
     <link rel="icon" type="image/x-icon" href="assets/page-viewer-logo.png">
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            500: '#0ea5e9',
+                        },
+                        accent: {
+                            100: '#d6f6f8',
+                            500: '#0cb6bf',
+                        },
+                        secondary: {
+                            500: '#6366f1',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="auth-page text-gray-800">
-    <main class="auth-main">
-        <div class="auth-shell">
-            <section class="auth-card">
-                <a href="/" class="mb-8 flex items-center justify-center space-x-3 text-center">
-                    <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-9 w-9">
-                    <span class="text-2xl font-bold text-gray-800">PageViewer</span>
-                </a>
-                <div class="auth-panel">
-                    <h2 class="auth-card-title text-center">Аккаунт</h2>
-                    <div class="auth-form" data-account-state>
-                        <div class="auth-alert auth-alert-info">Проверяем сессию...</div>
-                    </div>
+<body class="bg-white text-gray-800">
+    <nav class="bg-white shadow-sm py-4">
+        <div class="container mx-auto px-4 md:px-6 flex justify-between items-center">
+            <a href="index.html" class="flex items-center space-x-2">
+                <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-8 w-8">
+                <span class="text-xl font-bold text-gray-800">PageViewer</span>
+            </a>
+            <div class="hidden md:flex items-center space-x-8">
+                <div class="flex items-center space-x-8">
+                    <a href="index.html#features" class="text-gray-600 hover:text-primary-500 transition">Возможности</a>
+                    <a href="index.html#download" class="text-gray-600 hover:text-primary-500 transition">Скачать</a>
+                    <a href="index.html#faq" class="text-gray-600 hover:text-primary-500 transition">FAQ</a>
                 </div>
-            </section>
+                <a href="login.html" class="inline-flex items-center rounded-lg border border-primary-500 px-4 py-2 text-sm font-semibold text-primary-500 transition hover:bg-primary-50" data-auth-guest>
+                    Вход
+                </a>
+                <a href="account.html" class="hidden h-10 w-10 items-center justify-center rounded-full border border-primary-100 bg-primary-50 text-primary-500 transition hover:border-primary-500 hover:bg-primary-100" aria-label="Открыть аккаунт" data-auth-user data-auth-avatar>
+                    <i data-feather="user" class="h-5 w-5"></i>
+                </a>
+            </div>
+            <button id="mobile-menu-toggle" class="md:hidden" type="button" aria-expanded="false" aria-controls="mobile-menu">
+                <i data-feather="menu" class="w-6 h-6"></i>
+            </button>
         </div>
+        <div id="mobile-menu" class="hidden border-t border-gray-100 px-4 pt-4 pb-2 md:hidden">
+            <div class="container mx-auto flex flex-col gap-3 px-0">
+                <a href="index.html#features" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">Возможности</a>
+                <a href="index.html#download" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">Скачать</a>
+                <a href="index.html#faq" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">FAQ</a>
+                <a href="login.html" class="mt-2 inline-flex items-center justify-center rounded-lg border border-primary-500 px-4 py-3 text-sm font-semibold text-primary-500 transition hover:bg-primary-50" data-auth-guest>
+                    Вход
+                </a>
+                <a href="account.html" class="hidden h-11 w-11 items-center justify-center rounded-full border border-primary-100 bg-primary-50 text-primary-500 transition hover:border-primary-500 hover:bg-primary-100" aria-label="Открыть аккаунт" data-auth-user data-auth-avatar>
+                    <i data-feather="user" class="h-5 w-5"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="py-12 md:py-16">
+            <div class="container mx-auto px-4 md:px-6">
+                <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
+                    <div class="space-y-8">
+                        <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:p-8" aria-labelledby="profile-title">
+                            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                                <div>
+                                    <h2 id="profile-title" class="text-2xl font-bold text-gray-900">Профиль</h2>
+                                </div>
+                                <span class="site-plan-badge" data-account-plan>Free</span>
+                            </div>
+                            <div class="mt-6 grid gap-2 rounded-lg bg-gray-50 p-4">
+                                <span class="text-sm font-semibold text-gray-500">Email</span>
+                                <strong class="break-all text-lg text-gray-900" data-profile-email>Загружаем...</strong>
+                            </div>
+                        </section>
+
+                        <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm md:p-8" aria-labelledby="licenses-title">
+                            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                                <div>
+                                    <h2 id="licenses-title" class="text-2xl font-bold text-gray-900">Лицензии</h2>
+                                </div>
+                            </div>
+                            <div class="mt-6" data-license-state>
+                                <div class="auth-alert auth-alert-info">Загружаем лицензии...</div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <aside class="space-y-8">
+                        <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm" aria-labelledby="download-title">
+                            <h2 id="download-title" class="text-xl font-bold text-gray-900">Приложение</h2>
+                            <div class="download-alert mt-5" data-download-alert hidden></div>
+                            <a href="#" class="download-btn mt-5 block border border-primary-500 text-primary-500 hover:bg-primary-50 font-semibold py-3 px-6 rounded-lg text-center" data-download-platform="windows">
+                                <div class="flex items-center justify-center">
+                                    <i data-feather="download" class="w-5 h-5 mr-2"></i>
+                                    Скачать для Windows
+                                </div>
+                            </a>
+                            <a href="#" class="download-btn mt-4 block border border-primary-500 text-primary-500 hover:bg-primary-50 font-semibold py-3 px-6 rounded-lg text-center" data-download-platform="macos">
+                                <div class="flex items-center justify-center">
+                                    <i data-feather="download" class="w-5 h-5 mr-2"></i>
+                                    Скачать для macOS
+                                </div>
+                            </a>
+                        </section>
+
+                        <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm" aria-labelledby="security-title">
+                            <h2 id="security-title" class="text-xl font-bold text-gray-900">Безопасность</h2>
+                            <p class="mt-2 text-sm text-gray-500">Отправьте ссылку для сброса пароля на email аккаунта.</p>
+                            <div class="mt-5 space-y-3">
+                                <div class="auth-alert auth-alert-info" data-password-reset-alert hidden></div>
+                                <button class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-primary-500 px-5 py-3 text-sm font-semibold text-primary-500 transition hover:bg-primary-50" type="button" data-password-reset>
+                                    <i data-feather="key" class="h-4 w-4"></i>
+                                    Сбросить пароль
+                                </button>
+                                <button class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-600 transition hover:border-primary-500 hover:text-primary-500" type="button" data-page-logout>
+                                    <i data-feather="log-out" class="h-4 w-4"></i>
+                                    Выйти
+                                </button>
+                            </div>
+                        </section>
+                    </aside>
+                </div>
+            </div>
+        </section>
     </main>
+
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4 md:px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <p class="footer-copy text-gray-400 mb-4 md:mb-0">© 2026 PageViewer</p>
+                <div class="footer-links">
+                    <a href="offer.html" class="text-gray-400 hover:text-white transition">Публичная оферта</a>
+                    <a href="terms.html" class="text-gray-400 hover:text-white transition">Пользовательское соглашение</a>
+                    <a href="privacy.html" class="text-gray-400 hover:text-white transition">Конфиденциальность</a>
+                    <a href="cookies.html" class="text-gray-400 hover:text-white transition">Cookies</a>
+                    <a href="disclaimer.html" class="text-gray-400 hover:text-white transition">Отказ от ответственности</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script src="auth.js"></script>
     <script>
         feather.replace();
 
-        const accountState = document.querySelector('[data-account-state]');
-        const render = (html) => {
-            accountState.innerHTML = html;
-        };
+        const profileEmail = document.querySelector('[data-profile-email]');
+        const accountPlan = document.querySelector('[data-account-plan]');
+        const licenseState = document.querySelector('[data-license-state]');
+        const resetAlert = document.querySelector('[data-password-reset-alert]');
+        const downloadAlert = document.querySelector('[data-download-alert]');
+
         const escapeHtml = (value) => String(value)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
@@ -43,44 +170,210 @@
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
 
-        const renderGuest = () => {
-            render(`
-                <div class="auth-alert auth-alert-warning">Для просмотра аккаунта нужно войти.</div>
-                <a href="login.html" class="auth-button auth-button-link">Войти</a>
-            `);
+        const formatDate = (value) => {
+            if (!value) return 'Не указано';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return 'Не указано';
+            return new Intl.DateTimeFormat('ru-RU', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+            }).format(date);
         };
 
-        const renderAccount = () => {
-            const user = window.PageViewerAuth.getUser();
-            const email = escapeHtml(user?.email || 'Аккаунт PageViewer');
-            render(`
-                <div class="account-summary">
-                    <span class="account-summary-label">Вы вошли как</span>
-                    <strong>${email}</strong>
-                </div>
-                <button class="auth-button" type="button" data-download>Скачать PageViewer</button>
-                <button class="auth-secondary-button" type="button" data-logout>Выйти</button>
-                <p class="auth-footnote"><a href="/" class="auth-link">Вернуться на главную</a></p>
-            `);
+        const normalizeLicenses = (payload) => {
+            if (Array.isArray(payload)) return payload;
+            if (Array.isArray(payload?.licenses)) return payload.licenses;
+            if (Array.isArray(payload?.items)) return payload.items;
+            if (payload?.license) return [payload.license];
+            return [];
+        };
 
-            accountState.querySelector('[data-download]')?.addEventListener('click', () => {
-                window.location.href = '/#download';
+        const isActiveLicense = (license) => {
+            const status = String(license.status || license.state || '').toLowerCase();
+            if (['active', 'paid', 'valid'].includes(status)) return true;
+            if (license.active === true) return true;
+            const expiresAt = license.expiresAt || license.validUntil || license.endsAt;
+            return expiresAt ? new Date(expiresAt).getTime() > Date.now() : false;
+        };
+
+        const renderEmptyLicenses = () => {
+            accountPlan.textContent = 'Free';
+            accountPlan.className = 'site-plan-badge';
+            licenseState.innerHTML = `
+                <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
+                    <h3 class="text-lg font-bold text-gray-900">У вас пока нет активных лицензий</h3>
+                    <a href="index.html#download" class="download-btn mt-5 block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600">Купить Pro</a>
+                </div>
+            `;
+        };
+
+        const renderLicenses = (licenses) => {
+            if (!licenses.length) {
+                renderEmptyLicenses();
+                return;
+            }
+
+            const hasActiveLicense = licenses.some(isActiveLicense);
+            accountPlan.textContent = hasActiveLicense ? 'Pro' : 'Free';
+            accountPlan.className = 'site-plan-badge';
+
+            licenseState.innerHTML = `
+                <div class="grid gap-4">
+                    ${licenses.map((license) => {
+                        const title = escapeHtml(license.title || license.name || license.plan || 'PageViewer Pro');
+                        const status = isActiveLicense(license) ? 'Активна' : escapeHtml(license.status || 'Не активна');
+                        const startedAt = formatDate(license.startedAt || license.createdAt || license.purchasedAt);
+                        const expiresAt = formatDate(license.expiresAt || license.validUntil || license.endsAt);
+                        return `
+                            <article class="rounded-xl border border-gray-200 p-5">
+                                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-900">${title}</h3>
+                                        <p class="mt-1 text-sm text-gray-500">Дата покупки: ${startedAt}</p>
+                                        <p class="text-sm text-gray-500">Действует до: ${expiresAt}</p>
+                                    </div>
+                                    <span class="inline-flex w-fit items-center rounded-full bg-sky-100 px-3 py-1 text-sm font-semibold text-sky-700">${status}</span>
+                                </div>
+                            </article>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        };
+
+        const setAuthNavigation = () => {
+            const isAuthenticated = window.PageViewerAuth.isAuthenticated();
+
+            document.querySelectorAll('[data-auth-guest]').forEach((item) => {
+                item.classList.toggle('hidden', isAuthenticated);
             });
 
-            accountState.querySelector('[data-logout]')?.addEventListener('click', async (event) => {
-                const button = event.currentTarget;
+            document.querySelectorAll('[data-auth-user]').forEach((item) => {
+                item.classList.toggle('hidden', !isAuthenticated);
+                item.classList.toggle('inline-flex', isAuthenticated);
+            });
+        };
+
+        const setDownloadAlert = (message, type = 'error') => {
+            if (!downloadAlert) return;
+            downloadAlert.hidden = !message;
+            downloadAlert.textContent = message || '';
+            downloadAlert.className = `download-alert mt-5 download-alert-${type}`;
+        };
+
+        const withDownloadLoading = async (link, callback) => {
+            const originalHtml = link.innerHTML;
+            link.classList.add('is-loading');
+            link.setAttribute('aria-busy', 'true');
+            link.innerHTML = '<span>Готовим ссылку...</span>';
+            try {
+                await callback();
+            } finally {
+                link.classList.remove('is-loading');
+                link.removeAttribute('aria-busy');
+                link.innerHTML = originalHtml;
+                feather.replace();
+            }
+        };
+
+        const logoutAndRedirect = async (button) => {
+            if (button) {
                 button.disabled = true;
                 button.textContent = 'Выходим...';
-                await window.PageViewerAuth.logout();
-                renderGuest();
-            });
+            }
+            await window.PageViewerAuth.logout();
+            window.location.href = 'login.html';
         };
 
-        if (!window.PageViewerAuth.isAuthenticated()) {
-            renderGuest();
-        } else {
-            renderAccount();
-        }
+        document.querySelectorAll('[data-page-logout]').forEach((button) => {
+            button.addEventListener('click', () => logoutAndRedirect(button));
+        });
+
+        document.querySelectorAll('[data-download-platform]').forEach((link) => {
+            link.addEventListener('click', (event) => {
+                event.preventDefault();
+                const platform = link.dataset.downloadPlatform || window.PageViewerAuth.detectPlatform();
+                setDownloadAlert('');
+
+                withDownloadLoading(link, async () => {
+                    try {
+                        await window.PageViewerAuth.startDownload(platform);
+                    } catch (error) {
+                        const normalized = window.PageViewerAuth.normalizeError(error);
+                        if (normalized.code === 'invalid_refresh_token' || normalized.status === 401) {
+                            window.PageViewerAuth.clearTokens();
+                            window.PageViewerAuth.savePostLoginRedirect('/account.html');
+                            window.location.href = 'login.html';
+                            return;
+                        }
+                        setDownloadAlert(normalized.message, 'error');
+                    }
+                });
+            });
+        });
+
+        document.getElementById('mobile-menu-toggle')?.addEventListener('click', () => {
+            const menu = document.getElementById('mobile-menu');
+            const isOpen = !menu.classList.contains('hidden');
+            menu.classList.toggle('hidden', isOpen);
+            document.getElementById('mobile-menu-toggle').setAttribute('aria-expanded', String(!isOpen));
+        });
+
+        document.querySelector('[data-password-reset]')?.addEventListener('click', async (event) => {
+            const button = event.currentTarget;
+            const user = window.PageViewerAuth.getUser();
+            const email = user?.email;
+            if (!email) return;
+
+            resetAlert.hidden = true;
+            button.disabled = true;
+            button.innerHTML = 'Отправляем...';
+            try {
+                await window.PageViewerAuth.requestPasswordReset(email);
+                resetAlert.hidden = false;
+                resetAlert.textContent = 'Мы отправили ссылку для сброса пароля на вашу почту.';
+                resetAlert.className = 'auth-alert auth-alert-success';
+            } catch (error) {
+                const normalized = window.PageViewerAuth.normalizeError(error);
+                resetAlert.hidden = false;
+                resetAlert.textContent = normalized.message;
+                resetAlert.className = 'auth-alert auth-alert-error';
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i data-feather="key" class="h-4 w-4"></i>Сбросить пароль';
+                feather.replace();
+            }
+        });
+
+        const initAccount = async () => {
+            if (!window.PageViewerAuth.isAuthenticated()) {
+                window.PageViewerAuth.savePostLoginRedirect('/account.html');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            setAuthNavigation();
+            const user = window.PageViewerAuth.getUser();
+            profileEmail.textContent = user?.email || 'Email не найден';
+
+            try {
+                await window.PageViewerAuth.getValidAccessToken();
+                const licenses = normalizeLicenses(await window.PageViewerAuth.apiRequest('/licenses', { auth: true }));
+                renderLicenses(licenses);
+            } catch (error) {
+                const normalized = window.PageViewerAuth.normalizeError(error);
+                if (normalized.status === 401 || normalized.code === 'invalid_refresh_token') {
+                    window.PageViewerAuth.clearTokens();
+                    window.PageViewerAuth.savePostLoginRedirect('/account.html');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                renderEmptyLicenses();
+            }
+        };
+
+        initAccount();
     </script>
 </body>
 </html>
