@@ -3,7 +3,20 @@
     const REFRESH_TOKEN_KEY = 'pageviewer.refreshToken';
     const PENDING_EMAIL_KEY = 'pageviewer.pendingVerificationEmail';
     const POST_LOGIN_REDIRECT_KEY = 'pageviewer.postLoginRedirect';
-    const API_BASE_URL = (window.PAGEVIEWER_API_BASE_URL || 'http://localhost:3001').replace(/\/$/, '');
+    const inferApiBaseUrl = () => {
+        if (window.PAGEVIEWER_API_BASE_URL) {
+            return window.PAGEVIEWER_API_BASE_URL;
+        }
+
+        const hostname = window.location.hostname;
+        if (hostname === 'pageviewer.ru' || hostname === 'www.pageviewer.ru') {
+            return 'https://api.pageviewer.ru';
+        }
+
+        return 'http://localhost:3001';
+    };
+
+    const API_BASE_URL = inferApiBaseUrl().replace(/\/$/, '');
 
     const messages = {
         email_already_registered: 'Этот email уже зарегистрирован. Войдите или восстановите пароль.',
