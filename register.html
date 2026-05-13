@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация - PageViewer</title>
     <link rel="icon" type="image/x-icon" href="assets/page-viewer-logo.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=5">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
@@ -27,7 +27,7 @@
     <main class="auth-main">
         <div class="auth-shell">
             <section class="auth-card">
-                <a href="index.html" class="mb-8 flex items-center justify-center space-x-3 text-center">
+                <a href="/" class="mb-8 flex items-center justify-center space-x-3 text-center">
                     <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-9 w-9">
                     <span class="text-2xl font-bold text-gray-800">PageViewer</span>
                 </a>
@@ -35,6 +35,8 @@
                     <h2 class="auth-card-title text-center">Введите email для регистрации</h2>
 
                     <form class="auth-form">
+                        <div class="auth-alert" data-form-alert hidden></div>
+
                         <label class="auth-field">
                             <span class="auth-label">Email</span>
                             <input class="auth-input" type="email" name="register-email" placeholder="you@example.com" data-field="email">
@@ -71,6 +73,7 @@
         </div>
     </main>
 
+    <script src="auth.js"></script>
     <script>
         feather.replace();
 
@@ -78,6 +81,8 @@
         const registerEmailInput = registerForm?.querySelector('[data-field="email"]');
         const registerPasswordInput = registerForm?.querySelector('[data-field="password"]');
         const registerRepeatInput = registerForm?.querySelector('[data-field="password-repeat"]');
+        const registerSubmit = registerForm?.querySelector('[type="submit"]');
+        const registerAlert = registerForm?.querySelector('[data-form-alert]');
 
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const passwordPattern = /^(?=.*[A-Za-zА-Яа-яЁё])(?=.*\d).{8,}$/;
@@ -89,6 +94,68 @@
                 error.textContent = message || '';
                 error.classList.toggle('is-visible', Boolean(message));
             }
+        };
+
+        const setFormAlert = (message, type = 'error') => {
+            if (!registerAlert) return;
+            registerAlert.hidden = !message;
+            registerAlert.textContent = message || '';
+            registerAlert.className = `auth-alert auth-alert-${type}`;
+        };
+
+        const setLoading = (isLoading) => {
+            if (!registerSubmit) return;
+            registerSubmit.disabled = isLoading;
+            registerSubmit.classList.toggle('is-loading', isLoading);
+            registerSubmit.textContent = isLoading ? 'Создаем...' : 'Создать аккаунт';
+        };
+
+        const escapeHtml = (value) => value
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+
+        const showVerificationRequired = (email, data) => {
+            const safeEmail = escapeHtml(email);
+            const devLink = data?.verificationToken
+                ? `<a class="auth-link" href="verify-email.html?token=${encodeURIComponent(data.verificationToken)}">Открыть dev-ссылку подтверждения</a>`
+                : '';
+
+            registerForm.innerHTML = `
+                <div class="auth-alert auth-alert-success">
+                    Мы отправили письмо для подтверждения email на ${safeEmail}. Перейдите по ссылке из письма, чтобы завершить регистрацию.
+                </div>
+                <button class="auth-button" type="button" data-resend-verification>Отправить письмо еще раз</button>
+                ${devLink ? `<p class="auth-dev-link">${devLink}</p>` : ''}
+                <p class="auth-footnote">Уже подтвердили email? <a href="login.html" class="auth-link">Войти</a></p>
+            `;
+
+            registerForm.querySelector('[data-resend-verification]')?.addEventListener('click', async (event) => {
+                const button = event.currentTarget;
+                button.disabled = true;
+                button.classList.add('is-loading');
+                button.textContent = 'Отправляем...';
+                try {
+                    const resendData = await window.PageViewerAuth.resendVerification(email);
+                    const resendDevLink = resendData?.verificationToken
+                        ? `<p class="auth-dev-link"><a class="auth-link" href="verify-email.html?token=${encodeURIComponent(resendData.verificationToken)}">Открыть новую dev-ссылку подтверждения</a></p>`
+                        : '';
+                    registerForm.querySelector('.auth-alert').textContent = 'Если аккаунт найден и email не подтвержден, мы отправим письмо повторно.';
+                    if (resendDevLink && !registerForm.querySelector('.auth-dev-link')) {
+                        button.insertAdjacentHTML('afterend', resendDevLink);
+                    }
+                } catch (error) {
+                    const normalized = window.PageViewerAuth.normalizeError(error);
+                    registerForm.querySelector('.auth-alert').textContent = normalized.message;
+                    registerForm.querySelector('.auth-alert').className = 'auth-alert auth-alert-error';
+                } finally {
+                    button.disabled = false;
+                    button.classList.remove('is-loading');
+                    button.textContent = 'Отправить письмо еще раз';
+                }
+            });
         };
 
         const validateEmail = () => {
@@ -150,12 +217,29 @@
         });
 
         registerForm?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            setFormAlert('');
             const isEmailValid = validateEmail();
             const isPasswordValid = validatePassword();
             const isRepeatValid = validatePasswordRepeat();
             if (!isEmailValid || !isPasswordValid || !isRepeatValid) {
-                event.preventDefault();
+                return;
             }
+
+            const email = registerEmailInput.value.trim();
+            setLoading(true);
+            window.PageViewerAuth.register(email, registerPasswordInput.value)
+                .then((data) => {
+                    sessionStorage.setItem(window.PageViewerAuth.keys.pendingEmail, email);
+                    showVerificationRequired(email, data);
+                })
+                .catch((error) => {
+                    const normalized = window.PageViewerAuth.normalizeError(error);
+                    setFormAlert(normalized.message, 'error');
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
         });
     </script>
 </body>

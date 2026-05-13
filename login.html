@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Вход - PageViewer</title>
     <link rel="icon" type="image/x-icon" href="assets/page-viewer-logo.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=5">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
@@ -27,7 +27,7 @@
     <main class="auth-main">
         <div class="auth-shell">
             <section class="auth-card">
-                <a href="index.html" class="mb-8 flex items-center justify-center space-x-3 text-center">
+                <a href="/" class="mb-8 flex items-center justify-center space-x-3 text-center">
                     <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-9 w-9">
                     <span class="text-2xl font-bold text-gray-800">PageViewer</span>
                 </a>
@@ -35,6 +35,8 @@
                     <h2 class="auth-card-title text-center">Введите email для входа</h2>
 
                     <form class="auth-form">
+                        <div class="auth-alert" data-form-alert hidden></div>
+
                         <label class="auth-field">
                             <span class="auth-label">Email</span>
                             <input class="auth-input" type="email" name="login-email" placeholder="you@example.com" data-field="email">
@@ -63,12 +65,15 @@
         </div>
     </main>
 
+    <script src="auth.js"></script>
     <script>
         feather.replace();
 
         const loginForm = document.querySelector('.auth-form');
         const emailInput = loginForm?.querySelector('[data-field="email"]');
         const passwordInput = loginForm?.querySelector('[data-field="password"]');
+        const loginSubmit = loginForm?.querySelector('[type="submit"]');
+        const loginAlert = loginForm?.querySelector('[data-form-alert]');
 
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -79,6 +84,50 @@
                 error.textContent = message || '';
                 error.classList.toggle('is-visible', Boolean(message));
             }
+        };
+
+        const setFormAlert = (message, type = 'error') => {
+            if (!loginAlert) return;
+            loginAlert.hidden = !message;
+            loginAlert.textContent = message || '';
+            loginAlert.className = `auth-alert auth-alert-${type}`;
+        };
+
+        const setLoading = (isLoading) => {
+            if (!loginSubmit) return;
+            loginSubmit.disabled = isLoading;
+            loginSubmit.classList.toggle('is-loading', isLoading);
+            loginSubmit.textContent = isLoading ? 'Входим...' : 'Войти';
+        };
+
+        const showUnverifiedEmail = () => {
+            if (!loginAlert) return;
+            loginAlert.hidden = false;
+            loginAlert.className = 'auth-alert auth-alert-warning';
+            loginAlert.innerHTML = `
+                <span>Email не подтвержден. Проверьте почту или отправьте письмо повторно.</span>
+                <button class="auth-inline-button" type="button" data-resend-verification>Отправить письмо</button>
+            `;
+
+            loginAlert.querySelector('[data-resend-verification]')?.addEventListener('click', async (event) => {
+                const button = event.currentTarget;
+                button.disabled = true;
+                button.textContent = 'Отправляем...';
+                try {
+                    const data = await window.PageViewerAuth.resendVerification(emailInput.value.trim());
+                    const devLink = data?.verificationToken
+                        ? ` <a class="auth-link" href="verify-email.html?token=${encodeURIComponent(data.verificationToken)}">Открыть dev-ссылку</a>`
+                        : '';
+                    loginAlert.className = 'auth-alert auth-alert-success';
+                    loginAlert.innerHTML = `Если аккаунт найден и email не подтвержден, мы отправим письмо повторно.${devLink}`;
+                } catch (error) {
+                    const normalized = window.PageViewerAuth.normalizeError(error);
+                    setFormAlert(normalized.message, 'error');
+                } finally {
+                    button.disabled = false;
+                    button.textContent = 'Отправить письмо';
+                }
+            });
         };
 
         const validateEmail = () => {
@@ -116,11 +165,31 @@
         });
 
         loginForm?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            setFormAlert('');
             const isEmailValid = validateEmail();
             const isPasswordValid = validatePassword();
             if (!isEmailValid || !isPasswordValid) {
-                event.preventDefault();
+                return;
             }
+
+            setLoading(true);
+            window.PageViewerAuth.login(emailInput.value.trim(), passwordInput.value)
+                .then((data) => {
+                    window.PageViewerAuth.setTokens(data);
+                    window.location.href = window.PageViewerAuth.consumePostLoginRedirect() || '/';
+                })
+                .catch((error) => {
+                    const normalized = window.PageViewerAuth.normalizeError(error);
+                    if (normalized.code === 'email_not_verified') {
+                        showUnverifiedEmail();
+                        return;
+                    }
+                    setFormAlert(normalized.message, 'error');
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
         });
     </script>
 </body>

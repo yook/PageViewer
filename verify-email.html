@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтверждение email - PageViewer</title>
+    <link rel="icon" type="image/x-icon" href="assets/page-viewer-logo.png">
+    <link rel="stylesheet" href="style.css?v=5">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="auth-page text-gray-800">
+    <main class="auth-main">
+        <div class="auth-shell">
+            <section class="auth-card">
+                <a href="/" class="mb-8 flex items-center justify-center space-x-3 text-center">
+                    <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-9 w-9">
+                    <span class="text-2xl font-bold text-gray-800">PageViewer</span>
+                </a>
+                <div class="auth-panel">
+                    <h2 class="auth-card-title text-center">Подтверждение email</h2>
+                    <div class="auth-form" data-verify-state>
+                        <div class="auth-alert auth-alert-info">Проверяем ссылку подтверждения...</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        feather.replace();
+
+        const verifyState = document.querySelector('[data-verify-state]');
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        const emailFromQuery = (params.get('email') || '').trim();
+        const escapeHtml = (value) => value
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+
+        const render = (html) => {
+            verifyState.innerHTML = html;
+        };
+
+        const showMissingToken = () => {
+            render(`
+                <div class="auth-alert auth-alert-error">Ссылка подтверждения некорректна: в ней нет токена.</div>
+                <p class="auth-footnote"><a href="login.html" class="auth-link">Вернуться ко входу</a></p>
+            `);
+        };
+
+        const verifyEmail = async () => {
+            if (!token) {
+                showMissingToken();
+                return;
+            }
+
+            try {
+                const data = await window.PageViewerAuth.verifyEmail(token);
+                window.PageViewerAuth.setTokens(data);
+                sessionStorage.removeItem(window.PageViewerAuth.keys.pendingEmail);
+                render(`
+                    <div class="auth-alert auth-alert-success">Email подтвержден. Аккаунт готов к работе.</div>
+                    <a href="/#download" class="auth-button auth-button-link">Скачать PageViewer</a>
+                    <p class="auth-footnote"><a href="account.html" class="auth-link">Открыть аккаунт</a></p>
+                `);
+            } catch (error) {
+                const normalized = window.PageViewerAuth.normalizeError(error);
+                const pendingEmail = emailFromQuery || sessionStorage.getItem(window.PageViewerAuth.keys.pendingEmail) || '';
+                const safePendingEmail = escapeHtml(pendingEmail);
+                const resendControl = pendingEmail
+                    ? '<button class="auth-button" type="button" data-resend>Отправить новую ссылку</button>'
+                    : '<p class="auth-footnote"><a href="login.html" class="auth-link">Перейти ко входу</a></p>';
+                const helperText = normalized.code === 'invalid_or_expired_token' && pendingEmail
+                    ? `<p class="auth-footnote">Срок ссылки истек или она уже недействительна. Можно сразу отправить новую ссылку на ${safePendingEmail}.</p>`
+                    : '';
+
+                render(`
+                    <div class="auth-alert auth-alert-error">${normalized.message}</div>
+                    ${helperText}
+                    ${resendControl}
+                `);
+
+                verifyState.querySelector('[data-resend]')?.addEventListener('click', async (event) => {
+                    const button = event.currentTarget;
+                    button.disabled = true;
+                    button.textContent = 'Отправляем...';
+                    try {
+                        const data = await window.PageViewerAuth.resendVerification(pendingEmail);
+                        const devLink = data?.verificationToken
+                            ? `<p class="auth-dev-link"><a class="auth-link" href="verify-email.html?token=${encodeURIComponent(data.verificationToken)}&email=${encodeURIComponent(pendingEmail)}">Открыть новую dev-ссылку</a></p>`
+                            : '';
+                        render(`
+                            <div class="auth-alert auth-alert-success">Если аккаунт найден и email не подтвержден, мы отправим новое письмо.</div>
+                            ${devLink}
+                            <p class="auth-footnote"><a href="login.html" class="auth-link">Перейти ко входу</a></p>
+                        `);
+                    } catch (resendError) {
+                        const resendNormalized = window.PageViewerAuth.normalizeError(resendError);
+                        render(`<div class="auth-alert auth-alert-error">${resendNormalized.message}</div>`);
+                    }
+                });
+            }
+        };
+
+        verifyEmail();
+    </script>
+</body>
+</html>

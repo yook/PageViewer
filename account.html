@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Аккаунт - PageViewer</title>
+    <link rel="icon" type="image/x-icon" href="assets/page-viewer-logo.png">
+    <link rel="stylesheet" href="style.css?v=5">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="auth-page text-gray-800">
+    <main class="auth-main">
+        <div class="auth-shell">
+            <section class="auth-card">
+                <a href="/" class="mb-8 flex items-center justify-center space-x-3 text-center">
+                    <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-9 w-9">
+                    <span class="text-2xl font-bold text-gray-800">PageViewer</span>
+                </a>
+                <div class="auth-panel">
+                    <h2 class="auth-card-title text-center">Аккаунт</h2>
+                    <div class="auth-form" data-account-state>
+                        <div class="auth-alert auth-alert-info">Проверяем сессию...</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        feather.replace();
+
+        const accountState = document.querySelector('[data-account-state]');
+        const render = (html) => {
+            accountState.innerHTML = html;
+        };
+        const escapeHtml = (value) => String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+
+        const renderGuest = () => {
+            render(`
+                <div class="auth-alert auth-alert-warning">Для просмотра аккаунта нужно войти.</div>
+                <a href="login.html" class="auth-button auth-button-link">Войти</a>
+            `);
+        };
+
+        const renderAccount = () => {
+            const user = window.PageViewerAuth.getUser();
+            const email = escapeHtml(user?.email || 'Аккаунт PageViewer');
+            render(`
+                <div class="account-summary">
+                    <span class="account-summary-label">Вы вошли как</span>
+                    <strong>${email}</strong>
+                </div>
+                <button class="auth-button" type="button" data-download>Скачать PageViewer</button>
+                <button class="auth-secondary-button" type="button" data-logout>Выйти</button>
+                <p class="auth-footnote"><a href="/" class="auth-link">Вернуться на главную</a></p>
+            `);
+
+            accountState.querySelector('[data-download]')?.addEventListener('click', () => {
+                window.location.href = '/#download';
+            });
+
+            accountState.querySelector('[data-logout]')?.addEventListener('click', async (event) => {
+                const button = event.currentTarget;
+                button.disabled = true;
+                button.textContent = 'Выходим...';
+                await window.PageViewerAuth.logout();
+                renderGuest();
+            });
+        };
+
+        if (!window.PageViewerAuth.isAuthenticated()) {
+            renderGuest();
+        } else {
+            renderAccount();
+        }
+    </script>
+</body>
+</html>

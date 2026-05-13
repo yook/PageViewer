@@ -1,0 +1,253 @@
+(function () {
+    const ACCESS_TOKEN_KEY = 'pageviewer.accessToken';
+    const REFRESH_TOKEN_KEY = 'pageviewer.refreshToken';
+    const PENDING_EMAIL_KEY = 'pageviewer.pendingVerificationEmail';
+    const POST_LOGIN_REDIRECT_KEY = 'pageviewer.postLoginRedirect';
+    const API_BASE_URL = (window.PAGEVIEWER_API_BASE_URL || 'http://localhost:3001').replace(/\/$/, '');
+
+    const messages = {
+        email_already_registered: 'Этот email уже зарегистрирован. Войдите или восстановите пароль.',
+        invalid_credentials: 'Неверный email или пароль.',
+        email_not_verified: 'Email не подтвержден. Проверьте почту или отправьте письмо повторно.',
+        invalid_or_expired_token: 'Ссылка недействительна или устарела.',
+        invalid_refresh_token: 'Сессия истекла. Войдите снова.',
+        not_implemented: 'Скачивание через сайт пока не настроено на сервере.',
+        network_error: 'Не удалось связаться с сервером. Попробуйте позже.',
+        validation_error: 'Проверьте заполнение формы.',
+        unknown_error: 'Что-то пошло не так. Попробуйте позже.',
+    };
+
+    const tokenStore = {
+        get accessToken() {
+            return localStorage.getItem(ACCESS_TOKEN_KEY);
+        },
+        get refreshToken() {
+            return localStorage.getItem(REFRESH_TOKEN_KEY);
+        },
+        setTokens(tokens) {
+            if (tokens?.accessToken) {
+                localStorage.setItem(ACCESS_TOKEN_KEY, tokens.accessToken);
+            }
+            if (tokens?.refreshToken) {
+                localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken);
+            }
+        },
+        clear() {
+            localStorage.removeItem(ACCESS_TOKEN_KEY);
+            localStorage.removeItem(REFRESH_TOKEN_KEY);
+        },
+        isAuthenticated() {
+            return Boolean(this.accessToken && this.refreshToken);
+        },
+    };
+
+    const decodeJwtPayload = (token) => {
+        if (!token || !token.includes('.')) return null;
+        try {
+            const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+            const json = decodeURIComponent(
+                atob(payload)
+                    .split('')
+                    .map((char) => `%${(`00${char.charCodeAt(0).toString(16)}`).slice(-2)}`)
+                    .join(''),
+            );
+            return JSON.parse(json);
+        } catch {
+            return null;
+        }
+    };
+
+    const isAccessTokenExpired = () => {
+        const payload = decodeJwtPayload(tokenStore.accessToken);
+        if (!payload?.exp) return false;
+        return payload.exp * 1000 <= Date.now() + 15000;
+    };
+
+    const normalizeError = (error, fallbackStatus) => {
+        if (error?.normalized) return error;
+        if (error instanceof TypeError) {
+            return {
+                normalized: true,
+                status: 0,
+                code: 'network_error',
+                message: messages.network_error,
+                details: {},
+            };
+        }
+
+        const response = error || {};
+        const rawMessage = Array.isArray(response.message) ? response.message.join(', ') : response.message;
+        const code = response.code || rawMessage || response.error || 'unknown_error';
+        const status = response.statusCode || response.status || fallbackStatus || 0;
+        return {
+            normalized: true,
+            status,
+            code,
+            message: messages[code] || (status === 400 ? messages.validation_error : messages.unknown_error),
+            details: response,
+        };
+    };
+
+    const parseResponse = async (response) => {
+        const text = await response.text();
+        if (!text) return {};
+        try {
+            return JSON.parse(text);
+        } catch {
+            return { message: text };
+        }
+    };
+
+    const apiRequest = async (path, options = {}) => {
+        const headers = {
+            Accept: 'application/json',
+            ...(options.headers || {}),
+        };
+
+        const requestOptions = {
+            method: options.method || 'GET',
+            headers,
+        };
+
+        if (options.body !== undefined) {
+            headers['Content-Type'] = 'application/json';
+            requestOptions.body = JSON.stringify(options.body);
+        }
+
+        if (options.auth) {
+            const token = await getValidAccessToken();
+            headers.Authorization = `Bearer ${token}`;
+        }
+
+        let response;
+        try {
+            response = await fetch(`${API_BASE_URL}${path}`, requestOptions);
+        } catch (error) {
+            throw normalizeError(error);
+        }
+
+        const payload = await parseResponse(response);
+        if (!response.ok) {
+            throw normalizeError({ ...payload, status: response.status }, response.status);
+        }
+
+        return payload;
+    };
+
+    const getValidAccessToken = async () => {
+        if (!tokenStore.refreshToken) {
+            throw normalizeError({ message: 'invalid_refresh_token', status: 401 });
+        }
+
+        if (tokenStore.accessToken && !isAccessTokenExpired()) {
+            return tokenStore.accessToken;
+        }
+
+        try {
+            const data = await apiRequest('/auth/refresh', {
+                method: 'POST',
+                body: { refreshToken: tokenStore.refreshToken },
+            });
+            tokenStore.setTokens({ accessToken: data.accessToken });
+            return data.accessToken;
+        } catch (error) {
+            tokenStore.clear();
+            throw normalizeError(error);
+        }
+    };
+
+    const getUser = () => decodeJwtPayload(tokenStore.accessToken);
+
+    const savePostLoginRedirect = (url) => {
+        sessionStorage.setItem(POST_LOGIN_REDIRECT_KEY, url || '/');
+    };
+
+    const consumePostLoginRedirect = () => {
+        const value = sessionStorage.getItem(POST_LOGIN_REDIRECT_KEY);
+        sessionStorage.removeItem(POST_LOGIN_REDIRECT_KEY);
+        return value;
+    };
+
+    const detectPlatform = () => {
+        const source = `${navigator.platform || ''} ${navigator.userAgent || ''}`.toLowerCase();
+        if (source.includes('mac')) return 'macos';
+        if (source.includes('win')) return 'windows';
+        return '';
+    };
+
+    const startDownload = async (platform) => {
+        const data = await apiRequest('/downloads/app', {
+            method: 'POST',
+            auth: true,
+            body: { platform },
+        });
+        const url = data.downloadUrl || data.signedUrl || data.url;
+        if (!url) {
+            const code = data.status || 'unknown_error';
+            throw normalizeError({ message: code, status: 400, ...data });
+        }
+        window.location.href = url;
+        return data;
+    };
+
+    const logout = async () => {
+        const refreshToken = tokenStore.refreshToken;
+        try {
+            if (refreshToken) {
+                await apiRequest('/auth/logout', {
+                    method: 'POST',
+                    body: { refreshToken },
+                });
+            }
+        } finally {
+            tokenStore.clear();
+        }
+    };
+
+    window.PageViewerAuth = {
+        API_BASE_URL,
+        keys: {
+            pendingEmail: PENDING_EMAIL_KEY,
+            postLoginRedirect: POST_LOGIN_REDIRECT_KEY,
+        },
+        messages,
+        normalizeError,
+        apiRequest,
+        setTokens: tokenStore.setTokens.bind(tokenStore),
+        clearTokens: tokenStore.clear.bind(tokenStore),
+        isAuthenticated: tokenStore.isAuthenticated.bind(tokenStore),
+        getAccessToken: () => tokenStore.accessToken,
+        getRefreshToken: () => tokenStore.refreshToken,
+        getUser,
+        getValidAccessToken,
+        savePostLoginRedirect,
+        consumePostLoginRedirect,
+        detectPlatform,
+        startDownload,
+        logout,
+        register: (email, password) => apiRequest('/auth/register', {
+            method: 'POST',
+            body: { email, password },
+        }),
+        login: (email, password) => apiRequest('/auth/login', {
+            method: 'POST',
+            body: { email, password },
+        }),
+        verifyEmail: (token) => apiRequest('/auth/email/verify', {
+            method: 'POST',
+            body: { token },
+        }),
+        resendVerification: (email) => apiRequest('/auth/email/resend-verification', {
+            method: 'POST',
+            body: { email },
+        }),
+        requestPasswordReset: (email) => apiRequest('/auth/password-reset/request', {
+            method: 'POST',
+            body: { email },
+        }),
+        confirmPasswordReset: (token, password) => apiRequest('/auth/password-reset/confirm', {
+            method: 'POST',
+            body: { token, password },
+        }),
+    };
+})();
