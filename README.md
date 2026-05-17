@@ -20,7 +20,7 @@ Recommended promotion path:
    - `https://dev-api.pageviewer.ru`
 5. Open PR from `develop` into `master`
 6. Merge into `master`
-7. GitHub Actions deploys production to:
+7. GitHub Pages publishes production from `master` to:
    - `https://pageviewer.ru`
 
 ## API routing
@@ -49,15 +49,9 @@ Required GitHub Actions secrets:
 - `SSH_PRIVATE_KEY_DEV` or fallback `SSH_PRIVATE_KEY`
 - `DEPLOY_PATH_DEV`
 
-### Production
-
-- `SSH_HOST`
-- `SSH_USER`
-- `SSH_PRIVATE_KEY`
-- `DEPLOY_PATH`
-
 ## Notes
 
 - staging site is expected to work with `dev-api.pageviewer.ru`
 - production site is expected to work with `api.pageviewer.ru`
-- no build step is required right now; workflows publish the static files directly
+- production is currently served by GitHub Pages from the `master` branch root
+- no build step is required right now; staging workflow publishes the static files directly
