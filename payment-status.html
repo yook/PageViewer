@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статус оплаты - PageViewer</title>
+    <link rel="icon" type="image/x-icon" href="assets/page-viewer-logo.png">
+    <link rel="stylesheet" href="style.css?v=5">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="auth-page text-gray-800">
+    <main class="auth-main">
+        <div class="auth-shell">
+            <section class="auth-card">
+                <a href="/" class="mb-8 flex items-center justify-center space-x-3 text-center">
+                    <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-9 w-9">
+                    <span class="text-2xl font-bold text-gray-800">PageViewer</span>
+                </a>
+                <div class="auth-panel">
+                    <h2 class="auth-card-title text-center">Статус оплаты</h2>
+                    <div class="auth-form" data-payment-state>
+                        <div class="auth-alert auth-alert-info">Проверяем статус оплаты...</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        feather.replace();
+
+        const paymentState = document.querySelector('[data-payment-state]');
+        const params = new URLSearchParams(window.location.search);
+        const orderId = (params.get('orderId') || '').trim();
+        const formatRub = (value) => new Intl.NumberFormat('ru-RU').format(Math.round((value || 0) / 100));
+        let socket = null;
+        let fallbackTimer = null;
+        let lastOrderSignature = '';
+
+        const render = (html) => {
+            paymentState.innerHTML = html;
+        };
+
+        const redirectToLogin = () => {
+            window.PageViewerAuth.savePostLoginRedirect(`/payment-status.html?orderId=${encodeURIComponent(orderId)}`);
+            window.location.href = 'login.html';
+        };
+
+        const renderMissingOrder = () => {
+            render(`
+                <div class="auth-alert auth-alert-error">В ссылке возврата нет номера заказа.</div>
+                <a href="checkout.html" class="auth-secondary-button auth-button-link">Вернуться к оформлению</a>
+            `);
+        };
+
+        const renderProcessingState = (message) => {
+            render(`
+                <div class="auth-alert auth-alert-info">
+                    <span class="auth-alert-with-spinner">
+                        <span class="auth-alert-spinner" aria-hidden="true"></span>
+                        <span>${message}</span>
+                    </span>
+                </div>
+            `);
+        };
+
+        const stopFallbackPolling = () => {
+            if (fallbackTimer) {
+                window.clearTimeout(fallbackTimer);
+                fallbackTimer = null;
+            }
+        };
+
+        const isTerminalStatus = (status) => ['paid', 'canceled', 'refunded', 'partially_refunded'].includes(status);
+
+        const getOrderSignature = (order) => JSON.stringify({
+            id: order.id,
+            status: order.status,
+            paidAt: order.paidAt,
+            refundedAt: order.refundedAt,
+            paymentId: order.paymentId,
+        });
+
+        const renderStatus = (order) => {
+            const signature = getOrderSignature(order);
+            if (signature === lastOrderSignature) {
+                return;
+            }
+            lastOrderSignature = signature;
+
+            const baseInfo = `
+                <div class="grid gap-3 rounded-2xl border border-gray-200 bg-white p-4 text-left">
+                    <div class="flex items-center justify-between gap-3 text-sm text-gray-500">
+                        <span>Заказ</span>
+                        <strong class="text-gray-900">${order.id}</strong>
+                    </div>
+                    <div class="flex items-center justify-between gap-3 text-sm text-gray-500">
+                        <span>Количество лицензий</span>
+                        <strong class="text-gray-900">${order.quantity}</strong>
+                    </div>
+                    <div class="flex items-center justify-between gap-3 text-sm text-gray-500">
+                        <span>Сумма</span>
+                        <strong class="text-gray-900">${formatRub(order.amountKopecks)} руб</strong>
+                    </div>
+                </div>
+            `;
+
+            if (order.status === 'paid') {
+                render(`
+                    <div class="auth-alert auth-alert-success">Оплата получена. Лицензии уже выпущены и отправлены на вашу почту.</div>
+                    ${baseInfo}
+                    <a href="account.html" class="auth-button auth-button-link">Открыть аккаунт</a>
+                `);
+                return;
+            }
+
+            if (order.status === 'canceled') {
+                render(`
+                    <div class="auth-alert auth-alert-warning">Платёж был отменён. Можно вернуться и попробовать снова.</div>
+                    ${baseInfo}
+                    <a href="checkout.html?quantity=${encodeURIComponent(order.quantity || 1)}" class="auth-button auth-button-link">Попробовать снова</a>
+                    <a href="account.html" class="auth-secondary-button auth-button-link">Вернуться в аккаунт</a>
+                `);
+                return;
+            }
+
+            if (order.status === 'refunded' || order.status === 'partially_refunded') {
+                render(`
+                    <div class="auth-alert auth-alert-warning">По заказу уже проведён возврат или частичный возврат.</div>
+                    ${baseInfo}
+                    <a href="account.html" class="auth-secondary-button auth-button-link">Открыть аккаунт</a>
+                `);
+                return;
+            }
+
+            render(`
+                <div class="auth-alert auth-alert-info">
+                    <span class="auth-alert-with-spinner">
+                        <span class="auth-alert-spinner" aria-hidden="true"></span>
+                        <span>Платёж ещё обрабатывается. Страница обновится автоматически сразу после подтверждения.</span>
+                    </span>
+                </div>
+                ${baseInfo}
+                <a href="account.html" class="auth-secondary-button auth-button-link">Открыть аккаунт</a>
+            `);
+        };
+
+        const renderErrorState = (message) => {
+            render(`
+                <div class="auth-alert auth-alert-error">${message}</div>
+                <a href="checkout.html" class="auth-secondary-button auth-button-link">Вернуться к оформлению</a>
+                <a href="account.html" class="auth-secondary-button auth-button-link">Открыть аккаунт</a>
+            `);
+        };
+
+        const scheduleFallbackPolling = () => {
+            stopFallbackPolling();
+            fallbackTimer = window.setTimeout(() => {
+                pollOrderStatus(true);
+            }, 4000);
+        };
+
+        const pollOrderStatus = async (isBackground = false) => {
+            if (!orderId) {
+                renderMissingOrder();
+                return;
+            }
+
+            if (!isBackground && !lastOrderSignature) {
+                renderProcessingState('Проверяем статус оплаты...');
+            }
+
+            try {
+                const order = await window.PageViewerAuth.getOrder(orderId);
+                renderStatus(order);
+                if (!isTerminalStatus(order.status)) {
+                    scheduleFallbackPolling();
+                } else {
+                    stopFallbackPolling();
+                }
+            } catch (error) {
+                const normalized = window.PageViewerAuth.normalizeError(error);
+                if (normalized.status === 401 || normalized.code === 'invalid_refresh_token') {
+                    window.PageViewerAuth.clearTokens();
+                    redirectToLogin();
+                    return;
+                }
+                renderErrorState(normalized.message);
+            }
+        };
+
+        const loadSocketIoClient = () => new Promise((resolve, reject) => {
+            if (window.io) {
+                resolve(window.io);
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = `${window.PageViewerAuth.API_BASE_URL}/socket.io/socket.io.js`;
+            script.onload = () => resolve(window.io);
+            script.onerror = () => reject(new Error('socket_loader_failed'));
+            document.head.appendChild(script);
+        });
+
+        const connectOrderSocket = async () => {
+            try {
+                const io = await loadSocketIoClient();
+                const accessToken = await window.PageViewerAuth.getValidAccessToken();
+                socket = io(window.PageViewerAuth.API_BASE_URL, {
+                    transports: ['websocket', 'polling'],
+                });
+
+                socket.on('connect', () => {
+                    socket.emit('orders:subscribe', {
+                        orderId,
+                        accessToken,
+                    });
+                });
+
+                socket.on('orders:update', (order) => {
+                    if (!order || order.id !== orderId) return;
+                    renderStatus(order);
+                    if (isTerminalStatus(order.status)) {
+                        stopFallbackPolling();
+                    }
+                });
+
+                socket.on('orders:error', (payload) => {
+                    if (payload?.code === 'invalid_access_token') {
+                        window.PageViewerAuth.clearTokens();
+                        redirectToLogin();
+                        return;
+                    }
+                    scheduleFallbackPolling();
+                });
+
+                socket.on('connect_error', () => {
+                    scheduleFallbackPolling();
+                });
+            } catch {
+                scheduleFallbackPolling();
+            }
+        };
+
+        const init = async () => {
+            if (!window.PageViewerAuth.isAuthenticated()) {
+                redirectToLogin();
+                return;
+            }
+
+            try {
+                await window.PageViewerAuth.getValidAccessToken();
+                await pollOrderStatus();
+                await connectOrderSocket();
+            } catch (error) {
+                const normalized = window.PageViewerAuth.normalizeError(error);
+                if (normalized.status === 401 || normalized.code === 'invalid_refresh_token') {
+                    window.PageViewerAuth.clearTokens();
+                    redirectToLogin();
+                    return;
+                }
+                renderErrorState(normalized.message);
+            }
+        };
+
+        init();
+    </script>
+</body>
+</html>

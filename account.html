@@ -33,22 +33,20 @@
 <body class="bg-white text-gray-800">
     <nav class="bg-white shadow-sm py-4">
         <div class="container mx-auto px-4 md:px-6 flex justify-between items-center">
-            <a href="index.html" class="flex items-center space-x-2">
+            <a href="/" class="flex items-center space-x-2">
                 <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-8 w-8">
                 <span class="text-xl font-bold text-gray-800">PageViewer</span>
             </a>
             <div class="hidden md:flex items-center space-x-8">
                 <div class="flex items-center space-x-8">
-                    <a href="index.html#features" class="text-gray-600 hover:text-primary-500 transition">Возможности</a>
-                    <a href="index.html#download" class="text-gray-600 hover:text-primary-500 transition">Скачать</a>
-                    <a href="index.html#faq" class="text-gray-600 hover:text-primary-500 transition">FAQ</a>
+                    <a href="/#features" class="text-gray-600 hover:text-primary-500 transition">Возможности</a>
+                    <a href="/#download" class="text-gray-600 hover:text-primary-500 transition">Скачать</a>
+                    <a href="/#faq" class="text-gray-600 hover:text-primary-500 transition">FAQ</a>
                 </div>
                 <a href="login.html" class="inline-flex items-center rounded-lg border border-primary-500 px-4 py-2 text-sm font-semibold text-primary-500 transition hover:bg-primary-50" data-auth-guest>
                     Вход
                 </a>
-                <a href="account.html" class="hidden h-10 w-10 items-center justify-center rounded-full border border-primary-100 bg-primary-50 text-primary-500 transition hover:border-primary-500 hover:bg-primary-100" aria-label="Открыть аккаунт" data-auth-user data-auth-avatar>
-                    <i data-feather="user" class="h-5 w-5"></i>
-                </a>
+                <a href="account.html" class="hidden max-w-[220px] truncate text-sm font-semibold text-primary-500 hover:text-primary-600" data-auth-user data-auth-email>Аккаунт</a>
             </div>
             <button id="mobile-menu-toggle" class="md:hidden" type="button" aria-expanded="false" aria-controls="mobile-menu">
                 <i data-feather="menu" class="w-6 h-6"></i>
@@ -56,15 +54,13 @@
         </div>
         <div id="mobile-menu" class="hidden border-t border-gray-100 px-4 pt-4 pb-2 md:hidden">
             <div class="container mx-auto flex flex-col gap-3 px-0">
-                <a href="index.html#features" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">Возможности</a>
-                <a href="index.html#download" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">Скачать</a>
-                <a href="index.html#faq" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">FAQ</a>
+                <a href="/#features" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">Возможности</a>
+                <a href="/#download" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">Скачать</a>
+                <a href="/#faq" class="rounded-lg px-3 py-2 text-gray-600 transition hover:bg-primary-50 hover:text-primary-500">FAQ</a>
                 <a href="login.html" class="mt-2 inline-flex items-center justify-center rounded-lg border border-primary-500 px-4 py-3 text-sm font-semibold text-primary-500 transition hover:bg-primary-50" data-auth-guest>
                     Вход
                 </a>
-                <a href="account.html" class="hidden h-11 w-11 items-center justify-center rounded-full border border-primary-100 bg-primary-50 text-primary-500 transition hover:border-primary-500 hover:bg-primary-100" aria-label="Открыть аккаунт" data-auth-user data-auth-avatar>
-                    <i data-feather="user" class="h-5 w-5"></i>
-                </a>
+                <a href="account.html" class="hidden truncate rounded-lg px-3 py-2 text-sm font-semibold text-primary-500 transition hover:bg-primary-50 hover:text-primary-600" data-auth-user data-auth-email>Аккаунт</a>
             </div>
         </div>
     </nav>
@@ -122,7 +118,7 @@
                             <p class="mt-2 text-sm text-gray-500">Отправьте ссылку для сброса пароля на email аккаунта.</p>
                             <div class="mt-5 space-y-3">
                                 <div class="auth-alert auth-alert-info" data-password-reset-alert hidden></div>
-                                <button class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-primary-500 px-5 py-3 text-sm font-semibold text-primary-500 transition hover:bg-primary-50" type="button" data-password-reset>
+                                <button class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 px-5 py-3 text-sm font-semibold text-gray-600 transition hover:border-primary-500 hover:text-primary-500" type="button" data-password-reset>
                                     <i data-feather="key" class="h-4 w-4"></i>
                                     Сбросить пароль
                                 </button>
@@ -162,6 +158,7 @@
         const licenseState = document.querySelector('[data-license-state]');
         const resetAlert = document.querySelector('[data-password-reset-alert]');
         const downloadAlert = document.querySelector('[data-download-alert]');
+        const proLicensePrice = 1800;
 
         const escapeHtml = (value) => String(value)
             .replace(/&/g, '&amp;')
@@ -203,9 +200,39 @@
             licenseState.innerHTML = `
                 <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
                     <h3 class="text-lg font-bold text-gray-900">У вас пока нет активных лицензий</h3>
-                    <a href="index.html#download" class="download-btn mt-5 block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600">Купить Pro</a>
+                    <div class="mt-5 grid gap-3 sm:grid-cols-[156px_minmax(0,1fr)] sm:items-end">
+                        <div class="grid text-left">
+                            <div class="grid grid-cols-[44px_minmax(0,1fr)_44px] overflow-hidden rounded-lg border border-gray-200 bg-white">
+                                <button class="flex h-12 items-center justify-center text-xl font-semibold text-gray-600 transition hover:bg-primary-50 hover:text-primary-500 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Уменьшить количество лицензий" data-license-decrease>-</button>
+                                <div class="flex h-12 items-center justify-center border-x border-gray-200 text-base font-semibold text-gray-900" data-license-quantity>1</div>
+                                <button class="flex h-12 items-center justify-center text-xl font-semibold text-gray-600 transition hover:bg-primary-50 hover:text-primary-500 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Увеличить количество лицензий" data-license-increase>+</button>
+                            </div>
+                        </div>
+                        <a href="checkout.html?quantity=1" class="download-btn block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600" data-checkout-link>Купить Pro за <span data-license-total>${proLicensePrice}</span> руб / год</a>
+                    </div>
                 </div>
             `;
+
+            let quantity = 1;
+            const quantityValue = licenseState.querySelector('[data-license-quantity]');
+            const total = licenseState.querySelector('[data-license-total]');
+            const decrease = licenseState.querySelector('[data-license-decrease]');
+            const increase = licenseState.querySelector('[data-license-increase]');
+            const checkoutLink = licenseState.querySelector('[data-checkout-link]');
+            const updateQuantity = (nextQuantity) => {
+                quantity = Math.min(10, Math.max(1, nextQuantity));
+                quantityValue.textContent = String(quantity);
+                total.textContent = String(proLicensePrice * quantity);
+                decrease.disabled = quantity <= 1;
+                increase.disabled = quantity >= 10;
+                if (checkoutLink) {
+                    checkoutLink.href = `checkout.html?quantity=${quantity}`;
+                }
+            };
+
+            decrease?.addEventListener('click', () => updateQuantity(quantity - 1));
+            increase?.addEventListener('click', () => updateQuantity(quantity + 1));
+            updateQuantity(quantity);
         };
 
         const renderLicenses = (licenses) => {
@@ -244,6 +271,8 @@
 
         const setAuthNavigation = () => {
             const isAuthenticated = window.PageViewerAuth.isAuthenticated();
+            const user = window.PageViewerAuth.getUser();
+            const email = user?.email || 'Аккаунт';
 
             document.querySelectorAll('[data-auth-guest]').forEach((item) => {
                 item.classList.toggle('hidden', isAuthenticated);
@@ -252,6 +281,11 @@
             document.querySelectorAll('[data-auth-user]').forEach((item) => {
                 item.classList.toggle('hidden', !isAuthenticated);
                 item.classList.toggle('inline-flex', isAuthenticated);
+            });
+
+            document.querySelectorAll('[data-auth-email]').forEach((item) => {
+                item.textContent = email;
+                item.setAttribute('title', email);
             });
         };
 
@@ -278,16 +312,14 @@
         };
 
         const logoutAndRedirect = async (button) => {
-            if (button) {
-                button.disabled = true;
-                button.textContent = 'Выходим...';
-            }
+            button.disabled = true;
+            button.innerHTML = 'Выходим...';
             await window.PageViewerAuth.logout();
             window.location.href = 'login.html';
         };
 
-        document.querySelectorAll('[data-page-logout]').forEach((button) => {
-            button.addEventListener('click', () => logoutAndRedirect(button));
+        document.querySelector('[data-page-logout]')?.addEventListener('click', (event) => {
+            logoutAndRedirect(event.currentTarget);
         });
 
         document.querySelectorAll('[data-download-platform]').forEach((link) => {

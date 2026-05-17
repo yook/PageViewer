@@ -17,6 +17,10 @@
             return 'http://localhost:3001';
         }
 
+        if (hostname === 'dev.pageviewer.ru') {
+            return 'https://dev-api.pageviewer.ru';
+        }
+
         return 'https://api.pageviewer.ru';
     };
 
@@ -29,6 +33,12 @@
         invalid_or_expired_token: 'Ссылка недействительна или устарела.',
         invalid_refresh_token: 'Сессия истекла. Войдите снова.',
         not_implemented: 'Скачивание через сайт пока не настроено на сервере.',
+        payments_not_configured: 'Оплата пока не настроена на сервере.',
+        payment_provider_error: 'Не удалось создать платёж. Попробуйте чуть позже.',
+        payment_provider_unavailable: 'Платёжный сервис временно недоступен. Попробуйте позже.',
+        order_not_found: 'Заказ не найден.',
+        order_not_found_for_payment: 'Не удалось сопоставить платёж с заказом.',
+        forbidden_order_access: 'У вас нет доступа к этому заказу.',
         network_error: 'Не удалось связаться с сервером. Попробуйте позже.',
         validation_error: 'Проверьте заполнение формы.',
         unknown_error: 'Что-то пошло не так. Попробуйте позже.',
@@ -259,6 +269,14 @@
         consumePostLoginRedirect,
         detectPlatform,
         startDownload,
+        createPayment: (plan, quantity) => apiRequest('/payments', {
+            method: 'POST',
+            auth: true,
+            body: { plan, quantity },
+        }),
+        getOrder: (id) => apiRequest(`/orders/${encodeURIComponent(id)}`, {
+            auth: true,
+        }),
         logout,
         register: (email, password) => apiRequest('/auth/register', {
             method: 'POST',

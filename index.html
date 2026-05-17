@@ -121,10 +121,7 @@
                 <a href="login.html" class="inline-flex items-center rounded-lg border border-primary-500 px-4 py-2 text-sm font-semibold text-primary-500 transition hover:bg-primary-50" data-auth-guest>
                     Вход
                 </a>
-                <div class="hidden items-center gap-3" data-auth-user>
-                    <a href="account.html" class="max-w-[220px] truncate text-sm font-semibold text-gray-700 hover:text-primary-500" data-auth-email>Аккаунт</a>
-                    <button class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-600 transition hover:border-primary-500 hover:text-primary-500" type="button" data-auth-logout>Выйти</button>
-                </div>
+                <a href="account.html" class="hidden max-w-[220px] truncate text-sm font-semibold text-gray-700 hover:text-primary-500" data-auth-user data-auth-email>Аккаунт</a>
             </div>
             <button id="mobile-menu-toggle" class="md:hidden" type="button" aria-expanded="false" aria-controls="mobile-menu">
                 <i data-feather="menu" class="w-6 h-6"></i>
@@ -138,10 +135,7 @@
                 <a href="login.html" class="mt-2 inline-flex items-center justify-center rounded-lg border border-primary-500 px-4 py-3 text-sm font-semibold text-primary-500 transition hover:bg-primary-50" data-auth-guest>
                     Вход
                 </a>
-                <div class="hidden flex-col gap-3 rounded-lg border border-gray-100 bg-gray-50 p-3" data-auth-user>
-                    <a href="account.html" class="truncate text-sm font-semibold text-gray-700" data-auth-email>Аккаунт</a>
-                    <button class="inline-flex items-center justify-center rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-600" type="button" data-auth-logout>Выйти</button>
-                </div>
+                <a href="account.html" class="hidden truncate rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-primary-50 hover:text-primary-500" data-auth-user data-auth-email>Аккаунт</a>
             </div>
         </div>
     </nav>
@@ -340,7 +334,7 @@
                                 <span>Рендеринг страниц через Chromium</span>
                             </li>
                         </ul>
-                        <a href="account.html" class="download-btn block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600" data-pro-link>
+                        <a href="checkout.html" class="download-btn block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600" data-pro-link>
                             Перейти на Pro
                         </a>
                         <p class="pricing-note mt-4 text-center text-xs text-gray-500">Отказаться можно в любой момент. Вернем деньги за неиспользованный период.</p>
@@ -603,7 +597,7 @@
 
             document.querySelectorAll('[data-auth-user]').forEach((item) => {
                 item.classList.toggle('hidden', !isAuthenticated);
-                item.classList.toggle('flex', isAuthenticated);
+                item.classList.toggle('inline-flex', isAuthenticated);
             });
 
             document.querySelectorAll('[data-auth-email]').forEach((item) => {
@@ -611,17 +605,6 @@
                 item.setAttribute('title', email);
             });
         };
-
-        document.querySelectorAll('[data-auth-logout]').forEach((button) => {
-            button.addEventListener('click', async () => {
-                button.disabled = true;
-                button.textContent = 'Выходим...';
-                await window.PageViewerAuth.logout();
-                setAuthNavigation();
-                button.disabled = false;
-                button.textContent = 'Выйти';
-            });
-        });
 
         setAuthNavigation();
 
@@ -678,11 +661,14 @@
         });
 
         document.querySelector('[data-pro-link]')?.addEventListener('click', (event) => {
+            event.preventDefault();
             if (!window.PageViewerAuth.isAuthenticated()) {
-                event.preventDefault();
-                window.PageViewerAuth.savePostLoginRedirect('/#download');
+                window.PageViewerAuth.savePostLoginRedirect('/checkout.html');
                 window.location.href = 'login.html';
+                return;
             }
+
+            window.location.href = 'checkout.html';
         });
         
         // FAQ toggle functionality

@@ -1,0 +1,51 @@
+name: Deploy Site Dev
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  deploy-dev:
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://dev.pageviewer.ru
+    concurrency:
+      group: pageviewer-site-staging
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Archive site
+        run: |
+          tar \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.DS_Store' \
+            -czf site.tgz .
+
+      - name: Upload archive
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST_DEV }}
+          username: ${{ secrets.SSH_USER_DEV }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_DEV || secrets.SSH_PRIVATE_KEY }}
+          source: site.tgz
+          target: /tmp
+
+      - name: Publish staging site
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST_DEV }}
+          username: ${{ secrets.SSH_USER_DEV }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_DEV || secrets.SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            mkdir -p "${{ secrets.DEPLOY_PATH_DEV }}"
+            find "${{ secrets.DEPLOY_PATH_DEV }}" -mindepth 1 -maxdepth 1 ! -name '.well-known' -exec rm -rf {} +
+            tar -xzf /tmp/site.tgz -C "${{ secrets.DEPLOY_PATH_DEV }}"
+            rm -f /tmp/site.tgz

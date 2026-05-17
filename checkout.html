@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оформление Pro - PageViewer</title>
+    <link rel="icon" type="image/x-icon" href="assets/page-viewer-logo.png">
+    <link rel="stylesheet" href="style.css?v=5">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="auth-page text-gray-800">
+    <main class="auth-main">
+        <div class="auth-shell">
+            <section class="auth-card">
+                <a href="/" class="mb-8 flex items-center justify-center space-x-3 text-center">
+                    <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-9 w-9">
+                    <span class="text-2xl font-bold text-gray-800">PageViewer</span>
+                </a>
+                <div class="auth-panel">
+                    <h2 class="auth-card-title text-center">Оформление Pro</h2>
+
+                    <div class="auth-form">
+                        <div class="auth-alert auth-alert-info" data-checkout-user hidden></div>
+                        <div class="auth-alert" data-checkout-alert hidden></div>
+
+                        <div class="rounded-2xl border border-gray-200 bg-gray-50 p-4 text-left">
+                            <p class="text-sm font-semibold text-gray-900">1 лицензия = 1 устройство</p>
+                            <p class="mt-1 text-sm text-gray-500">Срок действия каждой лицензии — 12 месяцев с момента оплаты.</p>
+                        </div>
+
+                        <div class="auth-field">
+                            <span class="auth-label">Количество лицензий</span>
+                            <div class="grid grid-cols-[52px_minmax(0,1fr)_52px] overflow-hidden rounded-2xl border border-gray-200 bg-white">
+                                <button class="flex h-14 items-center justify-center text-2xl font-semibold text-gray-600 transition hover:bg-primary-50 hover:text-primary-500 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Уменьшить количество" data-license-decrease>-</button>
+                                <div class="flex h-14 items-center justify-center border-x border-gray-200 text-lg font-semibold text-gray-900" data-license-quantity>1</div>
+                                <button class="flex h-14 items-center justify-center text-2xl font-semibold text-gray-600 transition hover:bg-primary-50 hover:text-primary-500 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Увеличить количество" data-license-increase>+</button>
+                            </div>
+                        </div>
+
+                        <div class="grid gap-3 rounded-2xl border border-gray-200 bg-white p-4">
+                            <div class="flex items-center justify-between gap-3 text-sm text-gray-500">
+                                <span>Цена за лицензию</span>
+                                <strong class="text-gray-900">1 800 руб / год</strong>
+                            </div>
+                            <div class="flex items-center justify-between gap-3 text-base font-semibold text-gray-900">
+                                <span>Итого к оплате</span>
+                                <strong data-license-total>1 800 руб</strong>
+                            </div>
+                        </div>
+
+                        <button class="auth-button" type="button" data-pay-button>Перейти к оплате</button>
+
+                        <p class="auth-footnote">После нажатия откроется защищённая страница оплаты ЮKassa.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        feather.replace();
+
+        const quantityNode = document.querySelector('[data-license-quantity]');
+        const totalNode = document.querySelector('[data-license-total]');
+        const decreaseButton = document.querySelector('[data-license-decrease]');
+        const increaseButton = document.querySelector('[data-license-increase]');
+        const payButton = document.querySelector('[data-pay-button]');
+        const alertNode = document.querySelector('[data-checkout-alert]');
+        const userNode = document.querySelector('[data-checkout-user]');
+        const params = new URLSearchParams(window.location.search);
+        const pricePerLicense = 1800;
+        const initialQuantity = Number.parseInt(params.get('quantity') || '1', 10);
+        let quantity = Math.min(10, Math.max(1, Number.isNaN(initialQuantity) ? 1 : initialQuantity));
+
+        const formatRub = (value) => new Intl.NumberFormat('ru-RU').format(value);
+
+        const setAlert = (message, type = 'error') => {
+            if (!alertNode) return;
+            alertNode.hidden = !message;
+            alertNode.textContent = message || '';
+            alertNode.className = `auth-alert auth-alert-${type}`;
+        };
+
+        const setLoading = (isLoading, label = 'Перейти к оплате') => {
+            payButton.disabled = isLoading;
+            payButton.classList.toggle('is-loading', isLoading);
+            payButton.innerHTML = isLoading
+                ? `<span class="auth-button-content"><span class="auth-button-spinner" aria-hidden="true"></span><span>${label}</span></span>`
+                : 'Перейти к оплате';
+        };
+
+        const syncQuantity = (nextQuantity) => {
+            quantity = Math.min(10, Math.max(1, nextQuantity));
+            quantityNode.textContent = String(quantity);
+            totalNode.textContent = `${formatRub(pricePerLicense * quantity)} руб`;
+            decreaseButton.disabled = quantity <= 1;
+            increaseButton.disabled = quantity >= 10;
+            params.set('quantity', String(quantity));
+            window.history.replaceState({}, '', `checkout.html?${params.toString()}`);
+        };
+
+        const redirectToLogin = () => {
+            window.PageViewerAuth.savePostLoginRedirect(`/checkout.html?quantity=${quantity}`);
+            window.location.href = 'login.html';
+        };
+
+        const initCheckout = async () => {
+            if (!window.PageViewerAuth.isAuthenticated()) {
+                redirectToLogin();
+                return;
+            }
+
+            const user = window.PageViewerAuth.getUser();
+            if (user?.email && userNode) {
+                userNode.hidden = false;
+                userNode.textContent = `После успешной оплаты ключи лицензий будут отправлены на ${user.email}`;
+            }
+
+            try {
+                await window.PageViewerAuth.getValidAccessToken();
+            } catch (error) {
+                const normalized = window.PageViewerAuth.normalizeError(error);
+                if (normalized.status === 401 || normalized.code === 'invalid_refresh_token') {
+                    window.PageViewerAuth.clearTokens();
+                    redirectToLogin();
+                    return;
+                }
+                setAlert(normalized.message, 'error');
+            }
+        };
+
+        decreaseButton?.addEventListener('click', () => syncQuantity(quantity - 1));
+        increaseButton?.addEventListener('click', () => syncQuantity(quantity + 1));
+
+        payButton?.addEventListener('click', async () => {
+            setAlert('');
+            setLoading(true, 'Готовим оплату...');
+
+            try {
+                const data = await window.PageViewerAuth.createPayment('year_license', quantity);
+                if (!data?.confirmationUrl) {
+                    throw { message: 'payment_provider_error', status: 503 };
+                }
+                setLoading(true, 'Переходим к оплате...');
+                window.location.href = data.confirmationUrl;
+            } catch (error) {
+                const normalized = window.PageViewerAuth.normalizeError(error);
+                if (normalized.status === 401 || normalized.code === 'invalid_refresh_token') {
+                    window.PageViewerAuth.clearTokens();
+                    redirectToLogin();
+                    return;
+                }
+                if (normalized.code === 'email_not_verified') {
+                    window.PageViewerAuth.savePostLoginRedirect(`/checkout.html?quantity=${quantity}`);
+                }
+                setAlert(normalized.message, 'error');
+                setLoading(false);
+            }
+        });
+
+        syncQuantity(quantity);
+        initCheckout();
+    </script>
+</body>
+</html>

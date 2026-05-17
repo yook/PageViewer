@@ -36,6 +36,7 @@
         const params = new URLSearchParams(window.location.search);
         const token = params.get('token');
         const emailFromQuery = (params.get('email') || '').trim();
+        const continueUrl = window.PageViewerAuth.consumePostLoginRedirect() || 'account.html';
         const escapeHtml = (value) => value
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
@@ -66,7 +67,7 @@
                 sessionStorage.removeItem(window.PageViewerAuth.keys.pendingEmail);
                 render(`
                     <div class="auth-alert auth-alert-success">Email подтвержден. Аккаунт готов к работе.</div>
-                    <a href="/#download" class="auth-button auth-button-link">Скачать PageViewer</a>
+                    <a href="${escapeHtml(continueUrl)}" class="auth-button auth-button-link">Продолжить</a>
                     <p class="auth-footnote"><a href="account.html" class="auth-link">Открыть аккаунт</a></p>
                 `);
             } catch (error) {
