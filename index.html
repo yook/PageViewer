@@ -609,16 +609,22 @@
         const loadPublicPricing = async () => {
             const priceNode = document.querySelector('[data-pro-price]');
             if (!priceNode) return;
+            const stopPriceTicker = window.PageViewerAuth.startValueTicker(priceNode, {
+                formatValue: (value) => new Intl.NumberFormat('ru-RU').format(value),
+            });
 
             try {
                 const pricing = await window.PageViewerAuth.getPricing({ force: true });
                 const annualPriceRub = Number(pricing?.annualPriceRub);
                 if (Number.isFinite(annualPriceRub) && annualPriceRub > 0) {
-                    priceNode.textContent = new Intl.NumberFormat('ru-RU').format(annualPriceRub);
+                    stopPriceTicker(new Intl.NumberFormat('ru-RU').format(annualPriceRub));
+                    return;
                 }
             } catch {
-                // Keep static fallback when pricing endpoint is unavailable.
+                // Keep fallback below when pricing endpoint is unavailable.
             }
+
+            stopPriceTicker(priceNode.textContent);
         };
 
         setAuthNavigation();

@@ -24,6 +24,13 @@ body > footer {
 	flex-shrink: 0;
 }
 
+.pricing-ticker {
+	display: inline-block;
+	min-width: 4ch;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: 0.02em;
+}
+
 .card {
 	max-width: 620px;
 	margin: 0 auto;

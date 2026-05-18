@@ -240,6 +240,32 @@
         return '';
     };
 
+    const startValueTicker = (node, options = {}) => {
+        if (!node) return () => {};
+
+        const values = Array.isArray(options.values) && options.values.length
+            ? options.values
+            : [888, 1088, 988, 1188];
+        const formatValue = options.formatValue || ((value) => String(value));
+        let index = 0;
+
+        node.classList.add('pricing-ticker');
+        node.textContent = formatValue(values[index]);
+
+        const timer = window.setInterval(() => {
+            index = (index + 1) % values.length;
+            node.textContent = formatValue(values[index]);
+        }, options.intervalMs || 180);
+
+        return (finalText) => {
+            window.clearInterval(timer);
+            node.classList.remove('pricing-ticker');
+            if (finalText !== undefined) {
+                node.textContent = finalText;
+            }
+        };
+    };
+
     const startDownload = async (platform) => {
         const data = await apiRequest('/downloads/app', {
             method: 'POST',
@@ -303,6 +329,7 @@
         savePostLoginRedirect,
         consumePostLoginRedirect,
         detectPlatform,
+        startValueTicker,
         getPricing,
         startDownload,
         createPayment: (plan, quantity) => apiRequest('/payments', {

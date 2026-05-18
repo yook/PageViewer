@@ -42,11 +42,11 @@
                         <div class="grid gap-3 rounded-2xl border border-gray-200 bg-white p-4">
                             <div class="flex items-center justify-between gap-3 text-sm text-gray-500">
                                 <span>Цена за лицензию</span>
-                                <strong class="text-gray-900" data-license-price>Загружаем...</strong>
+                                <strong class="text-gray-900" data-license-price>...</strong>
                             </div>
                             <div class="flex items-center justify-between gap-3 text-base font-semibold text-gray-900">
                                 <span>Итого к оплате</span>
-                                <strong data-license-total>Загружаем...</strong>
+                                <strong data-license-total>...</strong>
                             </div>
                         </div>
 
@@ -76,6 +76,13 @@
         const initialQuantity = Number.parseInt(params.get('quantity') || '1', 10);
         let quantity = Math.min(10, Math.max(1, Number.isNaN(initialQuantity) ? 1 : initialQuantity));
         let pricePerLicense = defaultPricePerLicense;
+        const stopPriceTicker = window.PageViewerAuth.startValueTicker(priceNode, {
+            formatValue: (value) => `${formatRub(value)} руб / год`,
+        });
+        const stopTotalTicker = window.PageViewerAuth.startValueTicker(totalNode, {
+            values: [888, 1888, 2888, 1288],
+            formatValue: (value) => `${formatRub(value)} руб`,
+        });
 
         const formatRub = (value) => new Intl.NumberFormat('ru-RU').format(value);
 
@@ -124,6 +131,8 @@
             }
 
             syncQuantity(quantity);
+            stopPriceTicker(priceNode.textContent);
+            stopTotalTicker(totalNode.textContent);
             payButton.disabled = false;
 
             if (!window.PageViewerAuth.isAuthenticated()) {
