@@ -284,6 +284,9 @@
                         const platform = license.platform ? escapeHtml(license.platform) : '';
                         const lastSeenAt = formatDateTime(license.lastSeenAt);
                         const deviceChangedAt = formatDateTime(license.deviceChangedAt);
+                        const unboundStatus = !license.deviceBound
+                            ? `<p class="mt-2 text-sm font-medium text-amber-700">${bindingStatus}</p>`
+                            : '';
                         const deviceInfo = license.deviceBound
                             ? `
                                 <div class="mt-3 grid gap-1 text-sm text-gray-600">
@@ -301,16 +304,17 @@
                                         <h3 class="text-lg font-bold text-gray-900">${title}</h3>
                                         <p class="mt-1 text-sm text-gray-500">Дата покупки: ${startedAt}</p>
                                         <p class="text-sm text-gray-500">Действует до: ${expiresAt}</p>
+                                        ${unboundStatus}
                                         ${deviceInfo}
                                     </div>
                                     <div class="flex w-full shrink-0 flex-col gap-3 sm:w-[280px] sm:items-end sm:text-right">
-                                        <span class="inline-flex w-fit items-center rounded-full px-3 py-1 text-sm font-semibold ${bindingStatusClass}">${bindingStatus}</span>
+                                        ${license.deviceBound ? `<span class="inline-flex w-fit items-center rounded-full px-3 py-1 text-sm font-semibold ${bindingStatusClass}">${bindingStatus}</span>` : ''}
                                         <p class="text-sm font-semibold text-gray-900">Ключ: <code class="rounded bg-gray-100 px-2 py-1 text-xs font-bold tracking-wide text-gray-700">${maskedKey}</code></p>
                                         <button class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold transition ${sendButtonClass}" type="button" data-license-email ${sendButtonDisabled}>
                                             <i data-feather="mail" class="h-4 w-4"></i>
                                             Отправить на email
                                         </button>
-                                        <div class="auth-alert auth-alert-info w-full text-left sm:max-w-[280px]" data-license-email-alert hidden></div>
+                                        <div class="auth-alert auth-alert-info w-full text-left text-sm whitespace-nowrap sm:w-auto sm:max-w-none" data-license-email-alert hidden></div>
                                     </div>
                                 </div>
                             </article>
