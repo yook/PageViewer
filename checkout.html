@@ -42,15 +42,15 @@
                         <div class="grid gap-3 rounded-2xl border border-gray-200 bg-white p-4">
                             <div class="flex items-center justify-between gap-3 text-sm text-gray-500">
                                 <span>Цена за лицензию</span>
-                                <strong class="text-gray-900" data-license-price>1 800 руб / год</strong>
+                                <strong class="text-gray-900" data-license-price>Загружаем...</strong>
                             </div>
                             <div class="flex items-center justify-between gap-3 text-base font-semibold text-gray-900">
                                 <span>Итого к оплате</span>
-                                <strong data-license-total>1 800 руб</strong>
+                                <strong data-license-total>Загружаем...</strong>
                             </div>
                         </div>
 
-                        <button class="auth-button" type="button" data-pay-button>Перейти к оплате</button>
+                        <button class="auth-button" type="button" data-pay-button disabled>Перейти к оплате</button>
 
                         <p class="auth-footnote">После нажатия откроется защищённая страница оплаты ЮKassa.</p>
                     </div>
@@ -113,18 +113,18 @@
         };
 
         const initCheckout = async () => {
-            syncQuantity(quantity);
-
             try {
                 const pricing = await window.PageViewerAuth.getPricing({ force: true });
                 const annualPriceRub = Number(pricing?.annualPriceRub);
                 if (Number.isFinite(annualPriceRub) && annualPriceRub > 0) {
                     pricePerLicense = annualPriceRub;
-                    syncQuantity(quantity);
                 }
             } catch {
-                syncQuantity(quantity);
+                pricePerLicense = defaultPricePerLicense;
             }
+
+            syncQuantity(quantity);
+            payButton.disabled = false;
 
             if (!window.PageViewerAuth.isAuthenticated()) {
                 redirectToLogin();
