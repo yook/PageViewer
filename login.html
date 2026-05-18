@@ -100,6 +100,21 @@
             loginSubmit.textContent = isLoading ? 'Входим...' : 'Войти';
         };
 
+        const redirectAuthenticatedUser = async () => {
+            if (!window.PageViewerAuth.isAuthenticated()) {
+                return false;
+            }
+
+            try {
+                await window.PageViewerAuth.getValidAccessToken();
+                window.location.href = 'account.html';
+                return true;
+            } catch {
+                window.PageViewerAuth.clearTokens();
+                return false;
+            }
+        };
+
         const showUnverifiedEmail = () => {
             if (!loginAlert) return;
             loginAlert.hidden = false;
@@ -191,6 +206,8 @@
                     setLoading(false);
                 });
         });
+
+        redirectAuthenticatedUser();
     </script>
 </body>
 </html>

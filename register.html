@@ -110,6 +110,21 @@
             registerSubmit.textContent = isLoading ? 'Создаем...' : 'Создать аккаунт';
         };
 
+        const redirectAuthenticatedUser = async () => {
+            if (!window.PageViewerAuth.isAuthenticated()) {
+                return false;
+            }
+
+            try {
+                await window.PageViewerAuth.getValidAccessToken();
+                window.location.href = 'account.html';
+                return true;
+            } catch {
+                window.PageViewerAuth.clearTokens();
+                return false;
+            }
+        };
+
         const escapeHtml = (value) => value
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
@@ -241,6 +256,8 @@
                     setLoading(false);
                 });
         });
+
+        redirectAuthenticatedUser();
     </script>
 </body>
 </html>

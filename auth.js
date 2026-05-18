@@ -39,6 +39,9 @@
         order_not_found: 'Заказ не найден.',
         order_not_found_for_payment: 'Не удалось сопоставить платёж с заказом.',
         forbidden_order_access: 'У вас нет доступа к этому заказу.',
+        license_not_found: 'Лицензия не найдена.',
+        forbidden_license_access: 'У вас нет доступа к этой лицензии.',
+        license_key_email_unavailable: 'Для этой лицензии повторная отправка ключа пока недоступна.',
         network_error: 'Не удалось связаться с сервером. Попробуйте позже.',
         validation_error: 'Проверьте заполнение формы.',
         unknown_error: 'Что-то пошло не так. Попробуйте позже.',
@@ -275,6 +278,10 @@
             body: { plan, quantity },
         }),
         getOrder: (id) => apiRequest(`/orders/${encodeURIComponent(id)}`, {
+            auth: true,
+        }),
+        resendLicenseEmail: (id) => apiRequest(`/licenses/${encodeURIComponent(id)}/send-email`, {
+            method: 'POST',
             auth: true,
         }),
         logout,

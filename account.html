@@ -178,6 +178,19 @@
             }).format(date);
         };
 
+        const formatDateTime = (value) => {
+            if (!value) return 'Не указано';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return 'Не указано';
+            return new Intl.DateTimeFormat('ru-RU', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+            }).format(date);
+        };
+
         const normalizeLicenses = (payload) => {
             if (Array.isArray(payload)) return payload;
             if (Array.isArray(payload?.licenses)) return payload.licenses;
@@ -198,17 +211,22 @@
             accountPlan.textContent = 'Free';
             accountPlan.className = 'site-plan-badge';
             licenseState.innerHTML = `
-                <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
-                    <h3 class="text-lg font-bold text-gray-900">У вас пока нет активных лицензий</h3>
-                    <div class="mt-5 grid gap-3 sm:grid-cols-[156px_minmax(0,1fr)] sm:items-end">
-                        <div class="grid text-left">
-                            <div class="grid grid-cols-[44px_minmax(0,1fr)_44px] overflow-hidden rounded-lg border border-gray-200 bg-white">
-                                <button class="flex h-12 items-center justify-center text-xl font-semibold text-gray-600 transition hover:bg-primary-50 hover:text-primary-500 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Уменьшить количество лицензий" data-license-decrease>-</button>
-                                <div class="flex h-12 items-center justify-center border-x border-gray-200 text-base font-semibold text-gray-900" data-license-quantity>1</div>
-                                <button class="flex h-12 items-center justify-center text-xl font-semibold text-gray-600 transition hover:bg-primary-50 hover:text-primary-500 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Увеличить количество лицензий" data-license-increase>+</button>
+                <div class="grid gap-5">
+                    <div class="rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
+                        <h3 class="text-lg font-bold text-gray-900">У вас пока нет активных лицензий</h3>
+                        <p class="mt-2 text-sm text-gray-500">После покупки лицензии появятся здесь, а ключи придут на вашу почту.</p>
+                    </div>
+                    <div class="rounded-xl border border-gray-200 bg-white p-5">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                            <div class="w-[168px] shrink-0 text-left">
+                                <div class="grid grid-cols-[52px_1fr_52px] overflow-hidden rounded-lg border border-gray-200 bg-white">
+                                    <button class="flex h-12 items-center justify-center text-xl font-semibold text-gray-600 transition hover:bg-primary-50 hover:text-primary-500 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Уменьшить количество лицензий" data-license-decrease>-</button>
+                                    <div class="flex h-12 items-center justify-center border-x border-gray-200 text-base font-semibold text-gray-900" data-license-quantity>1</div>
+                                    <button class="flex h-12 items-center justify-center text-xl font-semibold text-gray-600 transition hover:bg-primary-50 hover:text-primary-500 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Увеличить количество лицензий" data-license-increase>+</button>
+                                </div>
                             </div>
+                            <a href="checkout.html?quantity=1" class="download-btn block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600 sm:flex-1" data-checkout-link>Купить Pro за <span data-license-total>${proLicensePrice}</span> руб / год</a>
                         </div>
-                        <a href="checkout.html?quantity=1" class="download-btn block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600" data-checkout-link>Купить Pro за <span data-license-total>${proLicensePrice}</span> руб / год</a>
                     </div>
                 </div>
             `;
@@ -249,24 +267,123 @@
                 <div class="grid gap-4">
                     ${licenses.map((license) => {
                         const title = escapeHtml(license.title || license.name || license.plan || 'PageViewer Pro');
-                        const status = isActiveLicense(license) ? 'Активна' : escapeHtml(license.status || 'Не активна');
+                        const bindingStatus = license.deviceBound ? 'Привязана к устройству' : 'Не привязана к устройству';
+                        const bindingStatusClass = license.deviceBound
+                            ? 'bg-sky-100 text-sky-700'
+                            : 'bg-amber-100 text-amber-700';
                         const startedAt = formatDate(license.startedAt || license.createdAt || license.purchasedAt);
                         const expiresAt = formatDate(license.expiresAt || license.validUntil || license.endsAt);
+                        const maskedKey = license.maskedKey
+                            ? escapeHtml(license.maskedKey)
+                            : 'Ключ будет доступен для новых лицензий';
+                        const sendButtonDisabled = license.canResendEmail ? '' : 'disabled';
+                        const sendButtonClass = license.canResendEmail
+                            ? 'text-primary-500 hover:border-primary-500 hover:text-primary-600'
+                            : 'cursor-not-allowed text-gray-400';
+                        const deviceName = license.deviceName ? escapeHtml(license.deviceName) : '';
+                        const platform = license.platform ? escapeHtml(license.platform) : '';
+                        const lastSeenAt = formatDateTime(license.lastSeenAt);
+                        const deviceChangedAt = formatDateTime(license.deviceChangedAt);
+                        const deviceInfo = license.deviceBound
+                            ? `
+                                <div class="mt-3 grid gap-1 text-sm text-gray-600">
+                                    <p><span class="font-semibold text-gray-900">Устройство:</span> ${deviceName || 'Устройство без названия'}</p>
+                                    <p><span class="font-semibold text-gray-900">Платформа:</span> ${platform || 'Не указана'}</p>
+                                    <p><span class="font-semibold text-gray-900">Последняя активность:</span> ${lastSeenAt}</p>
+                                    ${license.deviceChangedAt ? `<p><span class="font-semibold text-gray-900">Последняя смена устройства:</span> ${deviceChangedAt}</p>` : ''}
+                                </div>
+                            `
+                            : `
+                                <p class="mt-3 text-sm font-medium text-amber-700">Устройство не привязано</p>
+                            `;
                         return `
-                            <article class="rounded-xl border border-gray-200 p-5">
+                            <article class="rounded-xl border border-gray-200 p-5" data-license-card data-license-id="${escapeHtml(license.id)}">
                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                                     <div>
                                         <h3 class="text-lg font-bold text-gray-900">${title}</h3>
                                         <p class="mt-1 text-sm text-gray-500">Дата покупки: ${startedAt}</p>
                                         <p class="text-sm text-gray-500">Действует до: ${expiresAt}</p>
+                                        <p class="mt-3 text-sm font-semibold text-gray-900">Ключ: <code class="rounded bg-gray-100 px-2 py-1 text-xs font-bold tracking-wide text-gray-700">${maskedKey}</code></p>
+                                        ${deviceInfo}
                                     </div>
-                                    <span class="inline-flex w-fit items-center rounded-full bg-sky-100 px-3 py-1 text-sm font-semibold text-sky-700">${status}</span>
+                                    <span class="inline-flex w-fit items-center rounded-full px-3 py-1 text-sm font-semibold ${bindingStatusClass}">${bindingStatus}</span>
+                                </div>
+                                <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <button class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold transition ${sendButtonClass}" type="button" data-license-email ${sendButtonDisabled}>
+                                        <i data-feather="mail" class="h-4 w-4"></i>
+                                        Отправить на email
+                                    </button>
+                                    <div class="auth-alert auth-alert-info text-left" data-license-email-alert hidden></div>
                                 </div>
                             </article>
                         `;
                     }).join('')}
+                    <div class="rounded-xl border border-gray-200 bg-white p-5">
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+                            <div class="w-[168px] shrink-0 text-left">
+                                <div class="grid grid-cols-[52px_1fr_52px] overflow-hidden rounded-lg border border-gray-200 bg-white">
+                                    <button class="flex h-12 items-center justify-center text-xl font-semibold text-gray-600 transition hover:bg-primary-50 hover:text-primary-500 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Уменьшить количество лицензий" data-license-decrease>-</button>
+                                    <div class="flex h-12 items-center justify-center border-x border-gray-200 text-base font-semibold text-gray-900" data-license-quantity>1</div>
+                                    <button class="flex h-12 items-center justify-center text-xl font-semibold text-gray-600 transition hover:bg-primary-50 hover:text-primary-500 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Увеличить количество лицензий" data-license-increase>+</button>
+                                </div>
+                            </div>
+                            <a href="checkout.html?quantity=1" class="download-btn block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600 sm:flex-1" data-checkout-link>Купить ещё Pro за <span data-license-total>${proLicensePrice}</span> руб / год</a>
+                        </div>
+                    </div>
                 </div>
             `;
+
+            let quantity = 1;
+            const quantityValue = licenseState.querySelector('[data-license-quantity]');
+            const total = licenseState.querySelector('[data-license-total]');
+            const decrease = licenseState.querySelector('[data-license-decrease]');
+            const increase = licenseState.querySelector('[data-license-increase]');
+            const checkoutLink = licenseState.querySelector('[data-checkout-link]');
+            const updateQuantity = (nextQuantity) => {
+                quantity = Math.min(10, Math.max(1, nextQuantity));
+                quantityValue.textContent = String(quantity);
+                total.textContent = String(proLicensePrice * quantity);
+                decrease.disabled = quantity <= 1;
+                increase.disabled = quantity >= 10;
+                if (checkoutLink) {
+                    checkoutLink.href = `checkout.html?quantity=${quantity}`;
+                }
+            };
+
+            decrease?.addEventListener('click', () => updateQuantity(quantity - 1));
+            increase?.addEventListener('click', () => updateQuantity(quantity + 1));
+            updateQuantity(quantity);
+            feather.replace();
+
+            licenseState.querySelectorAll('[data-license-email]').forEach((button) => {
+                button.addEventListener('click', async () => {
+                    const card = button.closest('[data-license-card]');
+                    const licenseId = card?.dataset.licenseId;
+                    const alertNode = card?.querySelector('[data-license-email-alert]');
+                    if (!licenseId || !alertNode) return;
+
+                    const originalHtml = button.innerHTML;
+                    alertNode.hidden = true;
+                    button.disabled = true;
+                    button.innerHTML = 'Отправляем...';
+
+                    try {
+                        await window.PageViewerAuth.resendLicenseEmail(licenseId);
+                        alertNode.hidden = false;
+                        alertNode.textContent = 'Полный ключ отправлен на вашу почту.';
+                        alertNode.className = 'auth-alert auth-alert-success text-left';
+                    } catch (error) {
+                        const normalized = window.PageViewerAuth.normalizeError(error);
+                        alertNode.hidden = false;
+                        alertNode.textContent = normalized.message;
+                        alertNode.className = 'auth-alert auth-alert-error text-left';
+                    } finally {
+                        button.disabled = !licenses.find((item) => item.id === licenseId)?.canResendEmail;
+                        button.innerHTML = originalHtml;
+                        feather.replace();
+                    }
+                });
+            });
         };
 
         const setAuthNavigation = () => {
