@@ -305,7 +305,7 @@
                         </div>
                         <p class="text-center text-gray-600 mb-8">Для регулярной работы с крупными сайтами и расширенными возможностями приложения.</p>
                         <div class="flex items-end justify-center mb-8">
-                            <span class="text-5xl font-bold text-gray-800">1800</span>
+                            <span class="text-5xl font-bold text-gray-800" data-pro-price>1800</span>
                             <span class="text-gray-600 ml-2 text-xl">руб / год</span>
                         </div>
                         <ul class="space-y-4 mb-8 text-gray-700">
@@ -606,7 +606,23 @@
             });
         };
 
+        const loadPublicPricing = async () => {
+            const priceNode = document.querySelector('[data-pro-price]');
+            if (!priceNode) return;
+
+            try {
+                const pricing = await window.PageViewerAuth.getPricing();
+                const annualPriceRub = Number(pricing?.annualPriceRub);
+                if (Number.isFinite(annualPriceRub) && annualPriceRub > 0) {
+                    priceNode.textContent = new Intl.NumberFormat('ru-RU').format(annualPriceRub);
+                }
+            } catch {
+                // Keep static fallback when pricing endpoint is unavailable.
+            }
+        };
+
         setAuthNavigation();
+        loadPublicPricing();
 
         const downloadAlert = document.querySelector('[data-download-alert]');
         const setDownloadAlert = (message, type = 'error') => {

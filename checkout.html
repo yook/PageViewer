@@ -42,7 +42,7 @@
                         <div class="grid gap-3 rounded-2xl border border-gray-200 bg-white p-4">
                             <div class="flex items-center justify-between gap-3 text-sm text-gray-500">
                                 <span>Цена за лицензию</span>
-                                <strong class="text-gray-900">1 800 руб / год</strong>
+                                <strong class="text-gray-900" data-license-price>1 800 руб / год</strong>
                             </div>
                             <div class="flex items-center justify-between gap-3 text-base font-semibold text-gray-900">
                                 <span>Итого к оплате</span>
@@ -65,15 +65,17 @@
 
         const quantityNode = document.querySelector('[data-license-quantity]');
         const totalNode = document.querySelector('[data-license-total]');
+        const priceNode = document.querySelector('[data-license-price]');
         const decreaseButton = document.querySelector('[data-license-decrease]');
         const increaseButton = document.querySelector('[data-license-increase]');
         const payButton = document.querySelector('[data-pay-button]');
         const alertNode = document.querySelector('[data-checkout-alert]');
         const userNode = document.querySelector('[data-checkout-user]');
         const params = new URLSearchParams(window.location.search);
-        const pricePerLicense = 1800;
+        const defaultPricePerLicense = 1800;
         const initialQuantity = Number.parseInt(params.get('quantity') || '1', 10);
         let quantity = Math.min(10, Math.max(1, Number.isNaN(initialQuantity) ? 1 : initialQuantity));
+        let pricePerLicense = defaultPricePerLicense;
 
         const formatRub = (value) => new Intl.NumberFormat('ru-RU').format(value);
 
@@ -96,6 +98,9 @@
             quantity = Math.min(10, Math.max(1, nextQuantity));
             quantityNode.textContent = String(quantity);
             totalNode.textContent = `${formatRub(pricePerLicense * quantity)} руб`;
+            if (priceNode) {
+                priceNode.textContent = `${formatRub(pricePerLicense)} руб / год`;
+            }
             decreaseButton.disabled = quantity <= 1;
             increaseButton.disabled = quantity >= 10;
             params.set('quantity', String(quantity));
@@ -108,6 +113,19 @@
         };
 
         const initCheckout = async () => {
+            syncQuantity(quantity);
+
+            try {
+                const pricing = await window.PageViewerAuth.getPricing();
+                const annualPriceRub = Number(pricing?.annualPriceRub);
+                if (Number.isFinite(annualPriceRub) && annualPriceRub > 0) {
+                    pricePerLicense = annualPriceRub;
+                    syncQuantity(quantity);
+                }
+            } catch {
+                syncQuantity(quantity);
+            }
+
             if (!window.PageViewerAuth.isAuthenticated()) {
                 redirectToLogin();
                 return;
@@ -161,7 +179,6 @@
             }
         });
 
-        syncQuantity(quantity);
         initCheckout();
     </script>
 </body>

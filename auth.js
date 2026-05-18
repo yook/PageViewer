@@ -26,6 +26,7 @@
 
     const API_BASE_URL = inferApiBaseUrl().replace(/\/$/, '');
     let refreshInFlight = null;
+    let pricingCache = null;
 
     const messages = {
         email_already_registered: 'Этот email уже зарегистрирован. Войдите или восстановите пароль.',
@@ -267,6 +268,16 @@
         }
     };
 
+    const getPricing = async (options = {}) => {
+        if (!options.force && pricingCache) {
+            return pricingCache;
+        }
+
+        const data = await apiRequest('/public/pricing');
+        pricingCache = data;
+        return data;
+    };
+
     window.PageViewerAuth = {
         API_BASE_URL,
         keys: {
@@ -288,6 +299,7 @@
         savePostLoginRedirect,
         consumePostLoginRedirect,
         detectPlatform,
+        getPricing,
         startDownload,
         createPayment: (plan, quantity) => apiRequest('/payments', {
             method: 'POST',

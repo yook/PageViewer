@@ -158,7 +158,8 @@
         const licenseState = document.querySelector('[data-license-state]');
         const resetAlert = document.querySelector('[data-password-reset-alert]');
         const downloadAlert = document.querySelector('[data-download-alert]');
-        const proLicensePrice = 1800;
+        const defaultProLicensePrice = 1800;
+        let proLicensePrice = defaultProLicensePrice;
 
         const escapeHtml = (value) => String(value)
             .replace(/&/g, '&amp;')
@@ -190,6 +191,8 @@
                 minute: '2-digit',
             }).format(date);
         };
+
+        const formatRub = (value) => new Intl.NumberFormat('ru-RU').format(value);
 
         const normalizeLicenses = (payload) => {
             if (Array.isArray(payload)) return payload;
@@ -225,7 +228,7 @@
                                     <button class="flex h-12 items-center justify-center text-xl font-semibold text-gray-600 transition hover:bg-primary-50 hover:text-primary-500 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Увеличить количество лицензий" data-license-increase>+</button>
                                 </div>
                             </div>
-                            <a href="checkout.html?quantity=1" class="download-btn block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600 sm:flex-1" data-checkout-link>Купить Pro за <span data-license-total>${proLicensePrice}</span> руб / год</a>
+                            <a href="checkout.html?quantity=1" class="download-btn block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600 sm:flex-1" data-checkout-link>Купить Pro за <span data-license-total>${formatRub(proLicensePrice)}</span> руб / год</a>
                         </div>
                     </div>
                 </div>
@@ -240,7 +243,7 @@
             const updateQuantity = (nextQuantity) => {
                 quantity = Math.min(10, Math.max(1, nextQuantity));
                 quantityValue.textContent = String(quantity);
-                total.textContent = String(proLicensePrice * quantity);
+                total.textContent = formatRub(proLicensePrice * quantity);
                 decrease.disabled = quantity <= 1;
                 increase.disabled = quantity >= 10;
                 if (checkoutLink) {
@@ -328,7 +331,7 @@
                                     <button class="flex h-12 items-center justify-center text-xl font-semibold text-gray-600 transition hover:bg-primary-50 hover:text-primary-500 disabled:cursor-not-allowed disabled:opacity-40" type="button" aria-label="Увеличить количество лицензий" data-license-increase>+</button>
                                 </div>
                             </div>
-                            <a href="checkout.html?quantity=1" class="download-btn block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600 sm:flex-1" data-checkout-link>Купить Pro за <span data-license-total>${proLicensePrice}</span> руб / год</a>
+                            <a href="checkout.html?quantity=1" class="download-btn block w-full rounded-lg bg-primary-500 py-3 px-6 text-center font-semibold text-white shadow-sm hover:bg-primary-600 sm:flex-1" data-checkout-link>Купить Pro за <span data-license-total>${formatRub(proLicensePrice)}</span> руб / год</a>
                         </div>
                     </div>
                 </div>
@@ -343,7 +346,7 @@
             const updateQuantity = (nextQuantity) => {
                 quantity = Math.min(10, Math.max(1, nextQuantity));
                 quantityValue.textContent = String(quantity);
-                total.textContent = String(proLicensePrice * quantity);
+                total.textContent = formatRub(proLicensePrice * quantity);
                 decrease.disabled = quantity <= 1;
                 increase.disabled = quantity >= 10;
                 if (checkoutLink) {
@@ -402,6 +405,18 @@
                 item.textContent = email;
                 item.setAttribute('title', email);
             });
+        };
+
+        const loadPricing = async () => {
+            try {
+                const pricing = await window.PageViewerAuth.getPricing();
+                const annualPriceRub = Number(pricing?.annualPriceRub);
+                if (Number.isFinite(annualPriceRub) && annualPriceRub > 0) {
+                    proLicensePrice = annualPriceRub;
+                }
+            } catch {
+                proLicensePrice = defaultProLicensePrice;
+            }
         };
 
         const setDownloadAlert = (message, type = 'error') => {
@@ -500,6 +515,7 @@
                 return;
             }
 
+            await loadPricing();
             setAuthNavigation();
             const user = window.PageViewerAuth.getUser();
             profileEmail.textContent = user?.email || 'Email не найден';
