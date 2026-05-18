@@ -76,6 +76,7 @@
         const initialQuantity = Number.parseInt(params.get('quantity') || '1', 10);
         let quantity = Math.min(10, Math.max(1, Number.isNaN(initialQuantity) ? 1 : initialQuantity));
         let pricePerLicense = defaultPricePerLicense;
+        const formatRub = (value) => new Intl.NumberFormat('ru-RU').format(value);
         const stopPriceTicker = window.PageViewerAuth.startValueTicker(priceNode, {
             formatValue: (value) => `${formatRub(value)} руб / год`,
         });
@@ -83,8 +84,6 @@
             values: [888, 1888, 2888, 1288],
             formatValue: (value) => `${formatRub(value)} руб`,
         });
-
-        const formatRub = (value) => new Intl.NumberFormat('ru-RU').format(value);
 
         const setAlert = (message, type = 'error') => {
             if (!alertNode) return;
