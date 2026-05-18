@@ -314,7 +314,6 @@
                                             <i data-feather="mail" class="h-4 w-4"></i>
                                             Отправить на email
                                         </button>
-                                        <div class="auth-alert auth-alert-info w-full text-left text-sm whitespace-nowrap sm:w-auto sm:max-w-none" data-license-email-alert hidden></div>
                                     </div>
                                 </div>
                             </article>
@@ -361,27 +360,24 @@
                 button.addEventListener('click', async () => {
                     const card = button.closest('[data-license-card]');
                     const licenseId = card?.dataset.licenseId;
-                    const alertNode = card?.querySelector('[data-license-email-alert]');
-                    if (!licenseId || !alertNode) return;
+                    if (!licenseId) return;
 
                     const originalHtml = button.innerHTML;
-                    alertNode.hidden = true;
                     button.disabled = true;
                     button.innerHTML = 'Отправляем...';
 
                     try {
                         await window.PageViewerAuth.resendLicenseEmail(licenseId);
-                        alertNode.hidden = false;
-                        alertNode.textContent = 'Полный ключ отправлен на вашу почту.';
-                        alertNode.className = 'auth-alert auth-alert-success text-left';
+                        button.classList.add('cursor-not-allowed', 'text-gray-400');
+                        button.classList.remove('text-primary-500', 'hover:border-primary-500', 'hover:text-primary-600');
+                        button.innerHTML = 'Ключ отправлен на email';
+                        return;
                     } catch (error) {
                         const normalized = window.PageViewerAuth.normalizeError(error);
-                        alertNode.hidden = false;
-                        alertNode.textContent = normalized.message;
-                        alertNode.className = 'auth-alert auth-alert-error text-left';
-                    } finally {
-                        button.disabled = !licenses.find((item) => item.id === licenseId)?.canResendEmail;
+                        button.disabled = false;
                         button.innerHTML = originalHtml;
+                        window.alert(normalized.message);
+                    } finally {
                         feather.replace();
                     }
                 });
