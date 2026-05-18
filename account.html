@@ -29,6 +29,24 @@
             }
         }
     </script>
+    <style>
+        .auth-nav-pending [data-auth-guest],
+        .auth-nav-pending [data-auth-user] {
+            visibility: hidden;
+        }
+        .auth-state-authenticated [data-auth-guest] {
+            display: none !important;
+        }
+        .auth-state-authenticated [data-auth-user] {
+            display: inline-flex !important;
+        }
+        .auth-state-guest [data-auth-guest] {
+            display: inline-flex !important;
+        }
+        .auth-state-guest [data-auth-user] {
+            display: none !important;
+        }
+    </style>
     <script>
         (() => {
             const root = document.documentElement;
@@ -41,8 +59,6 @@
                 );
             } catch {
                 root.classList.add('auth-state-guest');
-            } finally {
-                root.classList.remove('auth-nav-pending');
             }
         })();
     </script>
@@ -439,6 +455,7 @@
             const email = user?.email || 'Аккаунт';
             document.documentElement.classList.toggle('auth-state-authenticated', isAuthenticated);
             document.documentElement.classList.toggle('auth-state-guest', !isAuthenticated);
+            document.documentElement.classList.remove('auth-nav-pending');
 
             document.querySelectorAll('[data-auth-guest]').forEach((item) => {
                 item.classList.toggle('hidden', isAuthenticated);
