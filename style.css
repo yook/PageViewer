@@ -24,6 +24,27 @@ body > footer {
 	flex-shrink: 0;
 }
 
+.auth-nav-pending [data-auth-guest],
+.auth-nav-pending [data-auth-user] {
+	visibility: hidden;
+}
+
+.auth-state-authenticated [data-auth-guest] {
+	display: none !important;
+}
+
+.auth-state-authenticated [data-auth-user] {
+	display: inline-flex !important;
+}
+
+.auth-state-guest [data-auth-guest] {
+	display: inline-flex !important;
+}
+
+.auth-state-guest [data-auth-user] {
+	display: none !important;
+}
+
 .pricing-ticker {
 	display: inline-block;
 	min-width: 4ch;

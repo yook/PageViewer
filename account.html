@@ -29,6 +29,23 @@
             }
         }
     </script>
+    <script>
+        (() => {
+            const root = document.documentElement;
+            root.classList.add('auth-nav-pending');
+            try {
+                const accessToken = localStorage.getItem('pageviewer.accessToken');
+                const refreshToken = localStorage.getItem('pageviewer.refreshToken');
+                root.classList.add(
+                    accessToken && refreshToken ? 'auth-state-authenticated' : 'auth-state-guest',
+                );
+            } catch {
+                root.classList.add('auth-state-guest');
+            } finally {
+                root.classList.remove('auth-nav-pending');
+            }
+        })();
+    </script>
 </head>
 <body class="bg-white text-gray-800">
     <nav class="bg-white shadow-sm py-4">
@@ -420,6 +437,8 @@
             const isAuthenticated = window.PageViewerAuth.isAuthenticated();
             const user = window.PageViewerAuth.getUser();
             const email = user?.email || 'Аккаунт';
+            document.documentElement.classList.toggle('auth-state-authenticated', isAuthenticated);
+            document.documentElement.classList.toggle('auth-state-guest', !isAuthenticated);
 
             document.querySelectorAll('[data-auth-guest]').forEach((item) => {
                 item.classList.toggle('hidden', isAuthenticated);
