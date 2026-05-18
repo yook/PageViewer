@@ -144,6 +144,7 @@
         const requestOptions = {
             method: options.method || 'GET',
             headers,
+            cache: options.cache,
         };
 
         if (options.body !== undefined) {
@@ -273,7 +274,10 @@
             return pricingCache;
         }
 
-        const data = await apiRequest('/public/pricing');
+        const cacheBuster = options.force ? `?t=${Date.now()}` : '';
+        const data = await apiRequest(`/public/pricing${cacheBuster}`, {
+            cache: 'no-store',
+        });
         pricingCache = data;
         return data;
     };

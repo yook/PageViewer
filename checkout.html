@@ -116,7 +116,7 @@
             syncQuantity(quantity);
 
             try {
-                const pricing = await window.PageViewerAuth.getPricing();
+                const pricing = await window.PageViewerAuth.getPricing({ force: true });
                 const annualPriceRub = Number(pricing?.annualPriceRub);
                 if (Number.isFinite(annualPriceRub) && annualPriceRub > 0) {
                     pricePerLicense = annualPriceRub;

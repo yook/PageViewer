@@ -611,7 +611,7 @@
             if (!priceNode) return;
 
             try {
-                const pricing = await window.PageViewerAuth.getPricing();
+                const pricing = await window.PageViewerAuth.getPricing({ force: true });
                 const annualPriceRub = Number(pricing?.annualPriceRub);
                 if (Number.isFinite(annualPriceRub) && annualPriceRub > 0) {
                     priceNode.textContent = new Intl.NumberFormat('ru-RU').format(annualPriceRub);
