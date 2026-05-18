@@ -119,8 +119,10 @@
                 await window.PageViewerAuth.getValidAccessToken();
                 window.location.href = 'account.html';
                 return true;
-            } catch {
-                window.PageViewerAuth.clearTokens();
+            } catch (error) {
+                if (window.PageViewerAuth.shouldReauthenticate(error)) {
+                    window.PageViewerAuth.clearTokens();
+                }
                 return false;
             }
         };

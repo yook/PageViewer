@@ -648,7 +648,7 @@
                         await window.PageViewerAuth.startDownload(platform);
                     } catch (error) {
                         const normalized = window.PageViewerAuth.normalizeError(error);
-                        if (normalized.code === 'invalid_refresh_token' || normalized.status === 401) {
+                        if (window.PageViewerAuth.shouldReauthenticate(normalized)) {
                             window.PageViewerAuth.clearTokens();
                             window.PageViewerAuth.savePostLoginRedirect('/#download');
                             window.location.href = 'register.html';

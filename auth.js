@@ -25,6 +25,7 @@
     };
 
     const API_BASE_URL = inferApiBaseUrl().replace(/\/$/, '');
+    let refreshInFlight = null;
 
     const messages = {
         email_already_registered: 'Этот email уже зарегистрирован. Войдите или восстановите пароль.',
@@ -118,6 +119,11 @@
         };
     };
 
+    const shouldReauthenticate = (error) => {
+        const normalized = normalizeError(error);
+        return normalized.code === 'invalid_refresh_token';
+    };
+
     const parseResponse = async (response) => {
         const text = await response.text();
         if (!text) return {};
@@ -173,17 +179,27 @@
             return tokenStore.accessToken;
         }
 
-        try {
-            const data = await apiRequest('/auth/refresh', {
-                method: 'POST',
-                body: { refreshToken: tokenStore.refreshToken },
-            });
-            tokenStore.setTokens({ accessToken: data.accessToken });
-            return data.accessToken;
-        } catch (error) {
-            tokenStore.clear();
-            throw normalizeError(error);
+        if (!refreshInFlight) {
+            refreshInFlight = (async () => {
+                try {
+                    const data = await apiRequest('/auth/refresh', {
+                        method: 'POST',
+                        body: { refreshToken: tokenStore.refreshToken },
+                    });
+                    tokenStore.setTokens({ accessToken: data.accessToken });
+                    return data.accessToken;
+                } catch (error) {
+                    if (shouldReauthenticate(error)) {
+                        tokenStore.clear();
+                    }
+                    throw normalizeError(error);
+                } finally {
+                    refreshInFlight = null;
+                }
+            })();
         }
+
+        return refreshInFlight;
     };
 
     const getUser = () => decodeJwtPayload(tokenStore.accessToken);
@@ -259,6 +275,7 @@
         },
         messages,
         normalizeError,
+        shouldReauthenticate,
         resolveAppUrl,
         apiRequest,
         setTokens: tokenStore.setTokens.bind(tokenStore),

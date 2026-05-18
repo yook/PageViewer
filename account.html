@@ -448,7 +448,7 @@
                         await window.PageViewerAuth.startDownload(platform);
                     } catch (error) {
                         const normalized = window.PageViewerAuth.normalizeError(error);
-                        if (normalized.code === 'invalid_refresh_token' || normalized.status === 401) {
+                        if (window.PageViewerAuth.shouldReauthenticate(normalized)) {
                             window.PageViewerAuth.clearTokens();
                             window.PageViewerAuth.savePostLoginRedirect('/account.html');
                             window.location.href = 'login.html';
@@ -510,7 +510,7 @@
                 renderLicenses(licenses);
             } catch (error) {
                 const normalized = window.PageViewerAuth.normalizeError(error);
-                if (normalized.status === 401 || normalized.code === 'invalid_refresh_token') {
+                if (window.PageViewerAuth.shouldReauthenticate(normalized)) {
                     window.PageViewerAuth.clearTokens();
                     window.PageViewerAuth.savePostLoginRedirect('/account.html');
                     window.location.href = 'login.html';
