@@ -14,14 +14,25 @@ Recommended promotion path:
 
 1. Open PR from `feature/*` into `develop`
 2. Merge into `develop`
-3. GitHub Actions deploys staging to:
+3. Deploy staging only after an explicit request to roll out on dev:
    - `https://dev.pageviewer.ru`
 4. Verify the site against:
    - `https://dev-api.pageviewer.ru`
 5. Open PR from `develop` into `master`
 6. Merge into `master`
-7. GitHub Pages publishes production from `master` to:
+7. Publish production from `master` only after an explicit request to roll out on prod:
    - `https://pageviewer.ru`
+
+## Default deployment rule
+
+The default rule for site changes is:
+
+- push fixes to `develop` first
+- deploy them to `dev` only after explicit confirmation
+- verify them on `https://dev.pageviewer.ru`
+- update `master` only after explicit confirmation that staging is OK
+
+Production publication is not the default next step after a change. `master` should receive only changes that have already been checked on the staging contour.
 
 ## API routing
 
