@@ -23,12 +23,11 @@ jobs:
       - name: Archive site
         run: |
           tar \
-            --warning=no-file-changed \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='.DS_Store' \
             --exclude='site.tgz' \
-            -czf site.tgz .
+            -czf site.tgz . || test -f site.tgz
 
       - name: Upload archive
         uses: appleboy/scp-action@v0.1.7
