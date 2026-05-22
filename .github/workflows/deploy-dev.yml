@@ -26,6 +26,7 @@ jobs:
             --exclude='.git' \
             --exclude='.github' \
             --exclude='.DS_Store' \
+            --exclude='site.tgz' \
             -czf site.tgz .
 
       - name: Upload archive
