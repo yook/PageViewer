@@ -23,6 +23,7 @@ jobs:
       - name: Archive site
         run: |
           tar \
+            --warning=no-file-changed \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='.DS_Store' \
