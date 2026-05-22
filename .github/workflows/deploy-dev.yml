@@ -26,7 +26,8 @@ jobs:
             --exclude='.git' \
             --exclude='.github' \
             --exclude='.DS_Store' \
-            -czf site.tgz .
+            --exclude='site.tgz' \
+            -czf site.tgz . || test -f site.tgz
 
       - name: Upload archive
         uses: appleboy/scp-action@v0.1.7
