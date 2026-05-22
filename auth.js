@@ -35,6 +35,8 @@
         invalid_or_expired_token: 'Ссылка недействительна или устарела.',
         invalid_refresh_token: 'Сессия истекла. Войдите снова.',
         not_implemented: 'Скачивание через сайт пока не настроено на сервере.',
+        download_not_available: 'Для этой платформы пока нет доступной сборки.',
+        downloads_not_configured: 'Скачивание временно недоступно. Попробуйте чуть позже.',
         payments_not_configured: 'Оплата пока не настроена на сервере.',
         payment_provider_error: 'Не удалось создать платёж. Попробуйте чуть позже.',
         payment_provider_unavailable: 'Платёжный сервис временно недоступен. Попробуйте позже.',
@@ -43,6 +45,7 @@
         forbidden_order_access: 'У вас нет доступа к этому заказу.',
         license_not_found: 'Лицензия не найдена.',
         forbidden_license_access: 'У вас нет доступа к этой лицензии.',
+        forbidden_device_change_request: 'Этот запрос на смену устройства принадлежит другому аккаунту.',
         license_key_email_unavailable: 'Для этой лицензии повторная отправка ключа пока недоступна.',
         network_error: 'Не удалось связаться с сервером. Попробуйте позже.',
         validation_error: 'Проверьте заполнение формы.',
@@ -368,6 +371,11 @@
         confirmPasswordReset: (token, password) => apiRequest('/auth/password-reset/confirm', {
             method: 'POST',
             body: { token, password },
+        }),
+        confirmDeviceChange: (token) => apiRequest('/licenses/device-change/confirm', {
+            method: 'POST',
+            auth: true,
+            body: { token },
         }),
     };
 })();

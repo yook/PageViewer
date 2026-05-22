@@ -107,7 +107,7 @@
 
             try {
                 await window.PageViewerAuth.getValidAccessToken();
-                window.location.href = 'account.html';
+                window.location.href = window.PageViewerAuth.consumePostLoginRedirect() || 'account.html';
                 return true;
             } catch (error) {
                 if (window.PageViewerAuth.shouldReauthenticate(error)) {
