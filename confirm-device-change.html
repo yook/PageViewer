@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подтверждение смены устройства - PageViewer</title>
+    <link rel="icon" type="image/x-icon" href="assets/page-viewer-logo.png">
+    <link rel="stylesheet" href="style.css?v=5">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body class="auth-page text-gray-800">
+    <main class="auth-main">
+        <div class="auth-shell">
+            <section class="auth-card">
+                <a href="/" class="mb-8 flex items-center justify-center space-x-3 text-center">
+                    <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-9 w-9">
+                    <span class="text-2xl font-bold text-gray-800">PageViewer</span>
+                </a>
+                <div class="auth-panel">
+                    <h2 class="auth-card-title text-center">Подтверждение смены устройства</h2>
+                    <div class="auth-form" data-device-change-state>
+                        <div class="auth-alert auth-alert-info">Проверяем ссылку подтверждения...</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        feather.replace();
+
+        const state = document.querySelector('[data-device-change-state]');
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+        const redirectTarget = `confirm-device-change.html${window.location.search || ''}`;
+
+        const escapeHtml = (value) => String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+
+        const render = (html) => {
+            state.innerHTML = html;
+        };
+
+        const showMissingToken = () => {
+            render(`
+                <div class="auth-alert auth-alert-error">Ссылка подтверждения некорректна: в ней нет токена.</div>
+                <p class="auth-footnote"><a href="login.html" class="auth-link">Вернуться ко входу</a></p>
+            `);
+        };
+
+        const showLoginRequired = () => {
+            window.PageViewerAuth.savePostLoginRedirect(redirectTarget);
+            render(`
+                <div class="auth-alert auth-alert-warning">Чтобы подтвердить смену устройства, войдите в свой аккаунт PageViewer.</div>
+                <button class="auth-button" type="button" data-login>Войти и продолжить</button>
+                <p class="auth-footnote"><a href="register.html" class="auth-link">Нет аккаунта? Зарегистрироваться</a></p>
+            `);
+
+            state.querySelector('[data-login]')?.addEventListener('click', () => {
+                window.location.href = 'login.html';
+            });
+        };
+
+        const confirmChange = async () => {
+            if (!token) {
+                showMissingToken();
+                return;
+            }
+
+            if (!window.PageViewerAuth.isAuthenticated()) {
+                showLoginRequired();
+                return;
+            }
+
+            try {
+                await window.PageViewerAuth.getValidAccessToken();
+            } catch (error) {
+                if (window.PageViewerAuth.shouldReauthenticate(error)) {
+                    window.PageViewerAuth.clearTokens();
+                }
+                showLoginRequired();
+                return;
+            }
+
+            render(`<div class="auth-alert auth-alert-info">Подтверждаем смену устройства...</div>`);
+
+            try {
+                await window.PageViewerAuth.confirmDeviceChange(token);
+                render(`
+                    <div class="auth-alert auth-alert-success">Смена устройства подтверждена. На новом устройстве можно продолжить работу в приложении.</div>
+                    <a href="account.html" class="auth-button auth-button-link">Открыть аккаунт</a>
+                    <p class="auth-footnote">Если приложение уже открыто на новом устройстве, просто повторите вход или проверку лицензии.</p>
+                `);
+            } catch (error) {
+                const normalized = window.PageViewerAuth.normalizeError(error);
+                const loginLink = '<p class="auth-footnote"><a href="login.html" class="auth-link">Войти в другой аккаунт</a></p>';
+                if (normalized.code === 'invalid_or_expired_token') {
+                    render(`
+                        <div class="auth-alert auth-alert-error">${escapeHtml(normalized.message)}</div>
+                        <p class="auth-footnote">Ссылка истекла или уже использована. Запустите восстановление лицензии на новом устройстве еще раз.</p>
+                        ${loginLink}
+                    `);
+                    return;
+                }
+
+                render(`
+                    <div class="auth-alert auth-alert-error">${escapeHtml(normalized.message)}</div>
+                    <p class="auth-footnote">Попробуйте еще раз из письма или повторите восстановление лицензии на новом устройстве.</p>
+                    ${loginLink}
+                `);
+            }
+        };
+
+        confirmChange();
+    </script>
+</body>
+</html>
