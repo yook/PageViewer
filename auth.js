@@ -372,6 +372,15 @@
             method: 'POST',
             body: { token, password },
         }),
+        requestWebLoginToken: (redirectPath) => apiRequest('/auth/web-login/request', {
+            method: 'POST',
+            auth: true,
+            body: { redirectPath },
+        }),
+        consumeWebLoginToken: (token) => apiRequest('/auth/web-login/consume', {
+            method: 'POST',
+            body: { token },
+        }),
         confirmDeviceChange: (token) => apiRequest('/licenses/device-change/confirm', {
             method: 'POST',
             auth: true,
