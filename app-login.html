@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход из приложения - PageViewer</title>
+    <link rel="icon" type="image/x-icon" href="assets/page-viewer-logo.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+    <main class="auth-shell">
+        <section class="auth-card">
+            <h1 class="auth-title">Переходим в аккаунт</h1>
+            <div class="auth-alert auth-alert-info" id="status">
+                Проверяем вход из приложения...
+            </div>
+            <div id="actions" class="auth-actions" hidden></div>
+        </section>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        (async () => {
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('token');
+            const status = document.getElementById('status');
+            const actions = document.getElementById('actions');
+
+            const escapeHtml = (value) => String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+
+            const renderActions = (html) => {
+                actions.hidden = false;
+                actions.innerHTML = html;
+            };
+
+            if (!token) {
+                status.className = 'auth-alert auth-alert-error';
+                status.textContent = 'Ссылка для входа недействительна.';
+                renderActions('<a href="login.html" class="auth-button auth-button-link">Перейти ко входу</a>');
+                return;
+            }
+
+            try {
+                const data = await window.PageViewerAuth.consumeWebLoginToken(token);
+                window.PageViewerAuth.setTokens({
+                    accessToken: data.accessToken,
+                    refreshToken: data.refreshToken,
+                });
+
+                const redirect = typeof data.redirectPath === 'string' && data.redirectPath
+                    ? data.redirectPath
+                    : '/account.html';
+                window.location.replace(window.PageViewerAuth.resolveAppUrl(redirect));
+            } catch (error) {
+                const normalized = window.PageViewerAuth.normalizeError(error);
+                status.className = 'auth-alert auth-alert-error';
+                status.textContent = normalized.message || 'Не удалось выполнить вход.';
+                renderActions(`
+                    <a href="login.html" class="auth-button auth-button-link">Перейти ко входу</a>
+                    <a href="account.html" class="auth-secondary-button auth-button-link">Открыть аккаунт</a>
+                `);
+            }
+        })();
+    </script>
+</body>
+</html>
