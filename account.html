@@ -272,6 +272,12 @@
             return expiresAt ? new Date(expiresAt).getTime() > Date.now() : false;
         };
 
+        const isVisibleLicense = (license) => {
+            const status = String(license.status || license.state || '').toLowerCase();
+            if (['refunded', 'revoked', 'expired'].includes(status)) return false;
+            return isActiveLicense(license);
+        };
+
         const renderEmptyLicenses = () => {
             accountPlan.textContent = 'Free';
             accountPlan.className = 'site-plan-badge';
@@ -319,13 +325,14 @@
         };
 
         const renderLicenses = (licenses) => {
-            if (!licenses.length) {
+            const visibleLicenses = licenses.filter(isVisibleLicense);
+            if (!visibleLicenses.length) {
                 renderEmptyLicenses();
                 return;
             }
 
-            const hasActiveLicense = licenses.some(isActiveLicense);
-            const sortedLicenses = [...licenses].sort((left, right) => {
+            const hasActiveLicense = visibleLicenses.some(isActiveLicense);
+            const sortedLicenses = [...visibleLicenses].sort((left, right) => {
                 if (left.deviceBound === right.deviceBound) return 0;
                 return left.deviceBound ? -1 : 1;
             });
