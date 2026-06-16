@@ -34,6 +34,33 @@ The default rule for site changes is:
 
 Production publication is not the default next step after a change. `master` should receive only changes that have already been checked on the staging contour.
 
+## Local branch archive
+
+To keep the local repository tidy, only active working branches should stay under `refs/heads`:
+
+- `develop`
+- `master`
+
+Old temporary and rollout branches are archived locally under `refs/archive/...` instead of staying in the normal local branch list.
+
+This means:
+
+- `git branch` stays short and readable
+- archived branch tips are still available if we need to recover something
+- the archive is local-only and is not published to `origin`
+
+To inspect archived refs:
+
+```bash
+git for-each-ref refs/archive
+```
+
+To restore one archived branch as a normal local branch:
+
+```bash
+git branch <new-branch-name> refs/archive/<archived-name>
+```
+
 ## API routing
 
 `auth.js` resolves API base URL like this:
