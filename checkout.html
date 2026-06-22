@@ -121,6 +121,10 @@
         };
 
         const initCheckout = async () => {
+            window.PageViewerAnalytics?.trackGoal('checkout_open', {
+                quantity,
+            });
+
             try {
                 const pricing = await window.PageViewerAuth.getPricing({ force: true });
                 const annualPriceRub = Number(pricing?.annualPriceRub);
@@ -172,6 +176,10 @@
                 if (!data?.confirmationUrl) {
                     throw { message: 'payment_provider_error', status: 503 };
                 }
+                window.PageViewerAnalytics?.trackGoal('payment_redirect', {
+                    quantity,
+                    totalRub: pricePerLicense * quantity,
+                });
                 setLoading(true, 'Переходим к оплате...');
                 window.location.href = data.confirmationUrl;
             } catch (error) {

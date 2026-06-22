@@ -111,6 +111,15 @@
             `;
 
             if (order.status === 'paid') {
+                window.PageViewerAnalytics?.trackOnce(
+                    `purchase_success:${order.id}`,
+                    'purchase_success',
+                    {
+                        orderId: order.id,
+                        quantity: order.quantity,
+                        totalRub: Math.round((order.amountKopecks || 0) / 100),
+                    },
+                );
                 render(`
                     <div class="auth-alert auth-alert-success">Оплата получена. Лицензии отправлены на вашу почту и уже доступны в личном кабинете.</div>
                     ${baseInfo}
