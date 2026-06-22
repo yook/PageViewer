@@ -49,6 +49,17 @@
                         <p class="auth-footnote">Для прямой связи также можно использовать <a href="mailto:support@pageviewer.ru" class="auth-link">support@pageviewer.ru</a>.</p>
                         <p class="auth-footnote"><a href="index.html" class="auth-link">Вернуться на главную</a></p>
                     </form>
+
+                    <section class="auth-form" data-feedback-success hidden>
+                        <div class="auth-alert auth-alert-success" role="status">
+                            <strong class="block text-base font-semibold">Сообщение отправлено</strong>
+                            <span class="mt-2 block">Мы получили ваше сообщение и ответим на указанный email.</span>
+                        </div>
+                        <div class="space-y-3">
+                            <button class="auth-button" type="button" data-feedback-reset>Отправить ещё одно сообщение</button>
+                            <a href="index.html" class="auth-secondary-button auth-button-link">Вернуться на главную</a>
+                        </div>
+                    </section>
                 </div>
             </section>
         </div>
@@ -65,6 +76,8 @@
         const feedbackMessage = document.querySelector('[data-feedback-message]');
         const feedbackCompany = document.querySelector('[data-feedback-company]');
         const feedbackSubmit = document.querySelector('[data-feedback-submit]');
+        const feedbackSuccess = document.querySelector('[data-feedback-success]');
+        const feedbackReset = document.querySelector('[data-feedback-reset]');
 
         const setFeedbackAlert = (message, type = 'error') => {
             if (!feedbackAlert) return;
@@ -73,12 +86,36 @@
             feedbackAlert.className = `auth-alert auth-alert-${type}`;
         };
 
+        const hideSupportForm = () => {
+            if (feedbackForm) {
+                feedbackForm.hidden = true;
+            }
+            if (feedbackSuccess) {
+                feedbackSuccess.hidden = false;
+            }
+        };
+
+        const showSupportForm = () => {
+            if (feedbackForm) {
+                feedbackForm.hidden = false;
+            }
+            if (feedbackSuccess) {
+                feedbackSuccess.hidden = true;
+            }
+        };
+
         if (feedbackEmail) {
             const user = window.PageViewerAuth.getUser();
             if (user?.email) {
                 feedbackEmail.value = user.email;
             }
         }
+
+        feedbackReset?.addEventListener('click', () => {
+            setFeedbackAlert('');
+            showSupportForm();
+            feedbackSubject?.focus();
+        });
 
         feedbackForm?.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -135,7 +172,8 @@
                 if (feedbackCompany) {
                     feedbackCompany.value = '';
                 }
-                setFeedbackAlert('Сообщение отправлено. Мы ответим на указанный email.', 'success');
+                setFeedbackAlert('');
+                hideSupportForm();
             } catch (error) {
                 const normalized = window.PageViewerAuth.normalizeError(error);
                 setFeedbackAlert(normalized.message, 'error');
