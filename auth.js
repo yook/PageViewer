@@ -280,6 +280,16 @@
             const code = data.status || 'unknown_error';
             throw normalizeError({ message: code, status: 400, ...data });
         }
+        const normalizedPlatform = String(platform || '').toLowerCase();
+        if (normalizedPlatform === 'windows' || normalizedPlatform === 'macos') {
+            window.PageViewerAnalytics?.trackGoal(`download_${normalizedPlatform}`, {
+                platform: normalizedPlatform,
+            });
+        } else {
+            window.PageViewerAnalytics?.trackGoal('download_app', {
+                platform: normalizedPlatform || 'unknown',
+            });
+        }
         window.location.href = url;
         return data;
     };

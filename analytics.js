@@ -29,3 +29,41 @@ window.ym(110061757, "init", {
   accurateTrackBounce: true,
   trackLinks: true,
 });
+
+window.PageViewerAnalytics = window.PageViewerAnalytics || {
+  counterId: 110061757,
+  trackGoal(goal, params) {
+    if (!goal || typeof window.ym !== "function") {
+      return false;
+    }
+
+    try {
+      if (params && typeof params === "object") {
+        window.ym(this.counterId, "reachGoal", goal, params);
+      } else {
+        window.ym(this.counterId, "reachGoal", goal);
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  trackOnce(key, goal, params) {
+    if (!key || !goal) {
+      return false;
+    }
+
+    try {
+      if (window.sessionStorage.getItem(key) === "1") {
+        return false;
+      }
+      const tracked = this.trackGoal(goal, params);
+      if (tracked) {
+        window.sessionStorage.setItem(key, "1");
+      }
+      return tracked;
+    } catch {
+      return this.trackGoal(goal, params);
+    }
+  },
+};
