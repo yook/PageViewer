@@ -69,6 +69,46 @@ git branch <new-branch-name> refs/archive/<archived-name>
 - `dev.pageviewer.ru` -> `https://dev-api.pageviewer.ru`
 - all other public hosts -> `https://api.pageviewer.ru`
 
+## Analytics
+
+Yandex Metrika is подключена через общий файл:
+
+- `/analytics.js`
+
+Для любой новой HTML-страницы сохраняем тот же шаблон:
+
+1. Подключаем общий скрипт перед `</head>`:
+
+```html
+<script src="analytics.js"></script>
+```
+
+2. Добавляем `noscript` fallback сразу после открытия `<body>`:
+
+```html
+<noscript><div><img src="https://mc.yandex.ru/watch/110061757" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+```
+
+Так счётчик не дублируется по логике и не требует копировать полный блок инициализации на каждую страницу.
+
+Проверочный скрипт:
+
+```bash
+node scripts/check-analytics.mjs
+```
+
+Он проходит по всем `.html` в корне `site` и проверяет:
+
+- подключение `analytics.js`
+- наличие `noscript`-fallback с `mc.yandex.ru/watch/110061757`
+
+Workflow-защита:
+
+- `/.github/workflows/deploy-dev.yml` запускает этот check перед staging deploy
+- `/.github/workflows/deploy-prod.yml` запускает тот же check перед production publish в GitHub Pages
+
+Чтобы production check был обязательным, Pages should publish through GitHub Actions workflow, not through branch-based auto publish from `master`.
+
 ## Deploy model
 
 The site is deployed as static files over SSH.
