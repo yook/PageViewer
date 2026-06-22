@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поддержка - PageViewer</title>
+    <link rel="icon" type="image/x-icon" href="assets/page-viewer-logo.png">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="analytics.js"></script>
+</head>
+<body class="auth-page text-gray-800">
+    <noscript><div><img src="https://mc.yandex.ru/watch/110061757" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <main class="auth-main">
+        <div class="auth-shell !max-w-3xl">
+            <section class="auth-card !max-w-3xl">
+                <a href="/" class="mb-8 flex items-center justify-center space-x-3 text-center">
+                    <img src="assets/page-viewer-logo.png" alt="Логотип PageViewer" class="h-9 w-9">
+                    <span class="text-2xl font-bold text-gray-800">PageViewer</span>
+                </a>
+                <div class="auth-panel">
+                    <h1 class="auth-card-title text-center">Поддержка</h1>
+                    <p class="auth-footnote mb-8">Если у вас есть вопрос по покупке, лицензии, скачиванию или работе приложения, отправьте сообщение через форму. Ответим на указанный email.</p>
+
+                    <form class="auth-form" data-feedback-form>
+                        <div class="auth-alert" data-feedback-alert hidden></div>
+
+                        <label class="auth-field">
+                            <span class="auth-label">Email для ответа</span>
+                            <input class="auth-input" type="email" name="email" placeholder="you@example.com" data-feedback-email>
+                        </label>
+
+                        <label class="auth-field">
+                            <span class="auth-label">Тема</span>
+                            <input class="auth-input" type="text" name="subject" placeholder="Например: проблема с активацией" data-feedback-subject>
+                        </label>
+
+                        <label class="auth-field">
+                            <span class="auth-label">Сообщение</span>
+                            <textarea class="auth-input min-h-[180px] resize-y" name="message" placeholder="Опишите вопрос как можно подробнее" data-feedback-message></textarea>
+                        </label>
+
+                        <input type="text" name="company" value="" tabindex="-1" autocomplete="off" class="hidden" data-feedback-company>
+
+                        <button class="auth-button" type="submit" data-feedback-submit>Отправить сообщение</button>
+
+                        <p class="auth-footnote">Для прямой связи также можно использовать <a href="mailto:support@pageviewer.ru" class="auth-link">support@pageviewer.ru</a>.</p>
+                        <p class="auth-footnote"><a href="index.html" class="auth-link">Вернуться на главную</a></p>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="auth.js"></script>
+    <script>
+        feather.replace();
+
+        const feedbackForm = document.querySelector('[data-feedback-form]');
+        const feedbackAlert = document.querySelector('[data-feedback-alert]');
+        const feedbackEmail = document.querySelector('[data-feedback-email]');
+        const feedbackSubject = document.querySelector('[data-feedback-subject]');
+        const feedbackMessage = document.querySelector('[data-feedback-message]');
+        const feedbackCompany = document.querySelector('[data-feedback-company]');
+        const feedbackSubmit = document.querySelector('[data-feedback-submit]');
+
+        const setFeedbackAlert = (message, type = 'error') => {
+            if (!feedbackAlert) return;
+            feedbackAlert.hidden = !message;
+            feedbackAlert.textContent = message || '';
+            feedbackAlert.className = `auth-alert auth-alert-${type}`;
+        };
+
+        if (feedbackEmail) {
+            const user = window.PageViewerAuth.getUser();
+            if (user?.email) {
+                feedbackEmail.value = user.email;
+            }
+        }
+
+        feedbackForm?.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            if (!feedbackEmail || !feedbackSubject || !feedbackMessage || !feedbackSubmit) {
+                return;
+            }
+
+            const email = feedbackEmail.value.trim();
+            const subject = feedbackSubject.value.trim();
+            const message = feedbackMessage.value.trim();
+            const company = feedbackCompany?.value.trim() || '';
+
+            setFeedbackAlert('');
+
+            if (!email) {
+                setFeedbackAlert('Введите email для ответа.', 'error');
+                feedbackEmail.focus();
+                return;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                setFeedbackAlert('Введите корректный email.', 'error');
+                feedbackEmail.focus();
+                return;
+            }
+
+            if (subject.length < 3) {
+                setFeedbackAlert('Укажите тему обращения.', 'error');
+                feedbackSubject.focus();
+                return;
+            }
+
+            if (message.length < 10) {
+                setFeedbackAlert('Опишите вопрос чуть подробнее.', 'error');
+                feedbackMessage.focus();
+                return;
+            }
+
+            feedbackSubmit.disabled = true;
+            feedbackSubmit.classList.add('is-loading');
+            feedbackSubmit.innerHTML = '<span class="auth-button-content"><span class="auth-button-spinner" aria-hidden="true"></span><span>Отправляем...</span></span>';
+
+            try {
+                await window.PageViewerAuth.submitSupportRequest({
+                    email,
+                    subject,
+                    message,
+                    company,
+                    page: window.location.href,
+                });
+                window.PageViewerAnalytics?.trackGoal('support_request_sent');
+                feedbackSubject.value = '';
+                feedbackMessage.value = '';
+                if (feedbackCompany) {
+                    feedbackCompany.value = '';
+                }
+                setFeedbackAlert('Сообщение отправлено. Мы ответим на указанный email.', 'success');
+            } catch (error) {
+                const normalized = window.PageViewerAuth.normalizeError(error);
+                setFeedbackAlert(normalized.message, 'error');
+            } finally {
+                feedbackSubmit.disabled = false;
+                feedbackSubmit.classList.remove('is-loading');
+                feedbackSubmit.textContent = 'Отправить сообщение';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -47,6 +47,7 @@
         forbidden_license_access: 'У вас нет доступа к этой лицензии.',
         forbidden_device_change_request: 'Этот запрос на смену устройства принадлежит другому аккаунту.',
         license_key_email_unavailable: 'Для этой лицензии повторная отправка ключа пока недоступна.',
+        support_rate_limited: 'Слишком много обращений за короткое время. Попробуйте немного позже.',
         network_error: 'Не удалось связаться с сервером. Попробуйте позже.',
         validation_error: 'Проверьте заполнение формы.',
         unknown_error: 'Что-то пошло не так. Попробуйте позже.',
@@ -377,6 +378,10 @@
         requestPasswordReset: (email) => apiRequest('/auth/password-reset/request', {
             method: 'POST',
             body: { email },
+        }),
+        submitSupportRequest: (payload) => apiRequest('/support/contact', {
+            method: 'POST',
+            body: payload,
         }),
         confirmPasswordReset: (token, password) => apiRequest('/auth/password-reset/confirm', {
             method: 'POST',
