@@ -45,7 +45,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY || secrets.SSH_PRIVATE_KEY_DEV }}
           source: site.tgz
           target: /tmp
 
@@ -54,7 +54,7 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY || secrets.SSH_PRIVATE_KEY_DEV }}
           script_stop: true
           script: |
             mkdir -p "${{ env.DEPLOY_PATH }}"
