@@ -105,9 +105,9 @@ node scripts/check-analytics.mjs
 Workflow-защита:
 
 - `/.github/workflows/deploy-dev.yml` запускает этот check перед staging deploy
-- `/.github/workflows/deploy-prod.yml` запускает тот же check перед production publish в GitHub Pages
+- `/.github/workflows/deploy-prod.yml` запускает тот же check перед production deploy на Timeweb Cloud
 
-Чтобы production check был обязательным, Pages should publish through GitHub Actions workflow, not through branch-based auto publish from `master`.
+Чтобы production check был обязательным, production publish должен идти только через GitHub Actions workflow, а не через branch-based auto publish.
 
 ## Deploy model
 
@@ -131,5 +131,5 @@ Required GitHub Actions secrets:
 
 - staging site is expected to work with `dev-api.pageviewer.ru`
 - production site is expected to work with `api.pageviewer.ru`
-- production is currently served by GitHub Pages from the `master` branch root
+- production is deployed to Timeweb Cloud over SSH into `/opt/pageviewer/site`
 - no build step is required right now; staging workflow publishes the static files directly
