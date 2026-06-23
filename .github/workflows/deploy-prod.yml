@@ -6,21 +6,18 @@ on:
       - master
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pageviewer-site-production
-  cancel-in-progress: false
+env:
+  DEPLOY_PATH: /opt/pageviewer/site
 
 jobs:
-  build:
+  deploy-prod:
     runs-on: ubuntu-latest
     environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      name: production
+      url: https://pageviewer.ru
+    concurrency:
+      group: pageviewer-site-production
+      cancel-in-progress: false
 
     steps:
       - name: Checkout
@@ -34,14 +31,33 @@ jobs:
       - name: Check Yandex Metrika
         run: node scripts/check-analytics.mjs
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      - name: Archive site
+        run: |
+          tar \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.DS_Store' \
+            --exclude='site.tgz' \
+            -czf site.tgz . || test -f site.tgz
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload archive
+        uses: appleboy/scp-action@v0.1.7
         with:
-          path: .
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: site.tgz
+          target: /tmp
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Publish production site
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            mkdir -p "${{ env.DEPLOY_PATH }}"
+            find "${{ env.DEPLOY_PATH }}" -mindepth 1 -maxdepth 1 ! -name '.well-known' -exec rm -rf {} +
+            tar -xzf /tmp/site.tgz -C "${{ env.DEPLOY_PATH }}"
+            rm -f /tmp/site.tgz
