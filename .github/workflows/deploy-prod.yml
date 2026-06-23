@@ -8,6 +8,7 @@ on:
 
 env:
   DEPLOY_PATH: /opt/pageviewer/site
+  ARCHIVE_NAME: site-prod.tgz
 
 jobs:
   deploy-prod:
@@ -38,7 +39,9 @@ jobs:
             --exclude='.github' \
             --exclude='.DS_Store' \
             --exclude='site.tgz' \
-            -czf site.tgz . || test -f site.tgz
+            --exclude='site-dev.tgz' \
+            --exclude='site-prod.tgz' \
+            -czf "${{ env.ARCHIVE_NAME }}" . || test -f "${{ env.ARCHIVE_NAME }}"
 
       - name: Upload archive
         uses: appleboy/scp-action@v0.1.7
@@ -46,7 +49,7 @@ jobs:
           host: ${{ secrets.SSH_HOST || secrets.SSH_HOST_DEV }}
           username: ${{ secrets.SSH_USER || secrets.SSH_USER_DEV }}
           key: ${{ secrets.SSH_PRIVATE_KEY || secrets.SSH_PRIVATE_KEY_DEV }}
-          source: site.tgz
+          source: ${{ env.ARCHIVE_NAME }}
           target: /tmp
 
       - name: Publish production site
@@ -59,5 +62,5 @@ jobs:
           script: |
             mkdir -p "${{ env.DEPLOY_PATH }}"
             find "${{ env.DEPLOY_PATH }}" -mindepth 1 -maxdepth 1 ! -name '.well-known' -exec rm -rf {} +
-            tar -xzf /tmp/site.tgz -C "${{ env.DEPLOY_PATH }}"
-            rm -f /tmp/site.tgz
+            tar -xzf "/tmp/${{ env.ARCHIVE_NAME }}" -C "${{ env.DEPLOY_PATH }}"
+            rm -f "/tmp/${{ env.ARCHIVE_NAME }}"
